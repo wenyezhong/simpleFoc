@@ -9,6 +9,7 @@ void delay(unsigned long dly)
 	while(tim_cnt);
 }
 
+
 void delayMicroseconds(unsigned long dly)
 {
   unsigned long t = _micros() + dly;
@@ -20,7 +21,7 @@ void delayMicroseconds(unsigned long dly)
   }
   else
   {
-    while( _micros() < t ){}; 
+    while( _micros() < t ){};
   }
 }
 

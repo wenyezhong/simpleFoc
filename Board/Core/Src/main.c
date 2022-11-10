@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "spi.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -25,10 +26,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include<stdio.h>
-// extern "C" {
-#include "Print.h"
-// }
-#include "SimpleFOCDebug.h"
 // #include "Print.h"
 /* USER CODE END Includes */
 
@@ -108,6 +105,7 @@ int main(void)
   MX_GPIO_Init();
   MX_UART4_Init();
   MX_TIM6_Init();
+  MX_SPI3_Init();
   /* USER CODE BEGIN 2 */
   printf("hello my simplefoc coming...\r\n");
   printf("SystemCoreClock = %lu\r\n",SystemCoreClock);
@@ -116,9 +114,9 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  test();
-  testSimpleFOCDebug();
-  
+  // test();
+  // testSimpleFOCDebug();
+  simpleFOCDrive_main();
   while (1)
   {
     /* USER CODE END WHILE */

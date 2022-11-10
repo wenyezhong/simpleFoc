@@ -3,6 +3,9 @@
 
 #include "foc_utils.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /** 
  * Function implementing delay() function in milliseconds 
  * - blocking function
@@ -19,4 +22,8 @@ void _delay(unsigned long ms);
 unsigned long _micros();
 void delay(unsigned long dly);
 void delayMicroseconds(unsigned long dly);
+
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -27,11 +27,16 @@ extern "C" {
 
 // STM specific includes
 #include <stm32f4xx_hal.h>  // Sets up the correct chip specifc defines required by arm_math
-// #include <i2c.h> 
 // #define ARM_MATH_CM4 // TODO: might change in future board versions
 #include <arm_math.h>
 // OS includes
-#include <cmsis_os.h>
+// #include <cmsis_os.h>
+// Hardware configuration
+#if HW_VERSION_MAJOR == 3
+#include "board_config_v3.h"
+#else
+#error "unknown board version"
+#endif
 
 
 
@@ -66,7 +71,26 @@ extern ODriveCAN *odCAN; */
 #include <SimpleFOCDebug.h>
 
 //#include <communication.h>
-
+ struct CurrentControl_t{
+        float p_gain; // [V/A]
+        float i_gain; // [V/As]
+        float v_current_control_integral_d; // [V]
+        float v_current_control_integral_q; // [V]
+        float Ibus; // DC bus current [A]
+        // Voltage applied at end of cycle:
+        float final_v_alpha; // [V]
+        float final_v_beta; // [V]
+        float Id_setpoint; // [A]
+        float Iq_setpoint; // [A]
+        float Iq_measured; // [A]
+        float Id_measured; // [A]
+        float I_measured_report_filter_k;
+        float max_allowed_current; // [A]
+        float overcurrent_trip_level; // [A]
+        float acim_rotor_flux; // [A]
+        float async_phase_vel; // [rad/s electrical]
+        float async_phase_offset; // [rad electrical]
+    };
 
 
 

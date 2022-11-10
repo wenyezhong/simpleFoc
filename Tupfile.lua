@@ -77,28 +77,11 @@ stm32f4xx_hal_pkg = {
 		'Src/stm32f4xx_hal_tim.c',
         'Src/stm32f4xx_hal_tim_ex.c',
 		'Src/stm32f4xx_hal_exti.c',
+        'Src/stm32f4xx_hal_spi.c',       
     },
     cflags = {'-DARM_MATH_CM4', '-mcpu=cortex-m4', '-mfpu=fpv4-sp-d16', '-DFPU_FPV4'}
 }
 
---[[ freertos_pkg = {
-    root = 'Board/Middlewares/Third_Party/FreeRTOS',
-    include_dirs = {
-        'Source/include',
-        'Source/CMSIS_RTOS',
-    },
-    code_files = {
-        'Source/croutine.c',
-        'Source/event_groups.c',
-        'Source/list.c',
-        'Source/queue.c',
-        'Source/stream_buffer.c',
-        'Source/tasks.c',
-        'Source/timers.c',
-        'Source/CMSIS_RTOS/cmsis_os.c',
-        'Source/portable/MemMang/heap_4.c',
-    }
-} ]]
 cmsis_pkg = {
     root = 'Board/Drivers/CMSIS',
     include_dirs = {
@@ -129,8 +112,12 @@ simpleFoc_firmware_pkg = {
         'Board/Middlewares/ST/ARM/DSP/Inc',
         'arduino',
         'communication',
+        'common',
         'common/base_classes',
         'MotorControl',
+        'current_sense',
+        'drivers',
+        'drivers/hardware_specific',
     },
     code_files = {
         'arduino/Print.cpp',
@@ -138,47 +125,51 @@ simpleFoc_firmware_pkg = {
         'common/base_classes/FOCMotor.cpp',
         'common/base_classes/Sensor.cpp',
         'communication/SimpleFOCDebug.cpp',
-        -- 'communication/Commander.cpp',
+        'communication/Commander.cpp',
         'common/foc_utils.cpp',
         'common/lowpass_filter.cpp',
         'common/pid.cpp',
         'common/time_utils.cpp',        
         'sensors/Encoder.cpp',
+        -- 'drivers/hardware_specific/stm32_mcu.cpp',
         'MotorControl/main.cpp',
-        
-    }
+        'MotorControl/BLDCMotor.cpp',
+        -- 'drivers/BLDCDriver3PWM.cpp',
+    },
+    cflags = {'-D_STM32_DEF_'},  
 }
 
 board_v3 = {
     root = 'Board/Core',
     include = {stm32f4xx_hal_pkg},
     include_dirs = {
-        'Inc',        
+        'Inc',
+        '../../drivers/DRV8301',
+        'common/base_classes',
         -- 'Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F', 
-        -- '../Drivers/DRV8301',
     },
     code_files = {
         '../startup_stm32f405xx.s',
         -- './Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c',
-        -- '../Drivers/DRV8301/drv8301.c',
+        '../../drivers/DRV8301/drv8301.c',
         --'board.cpp',
         'Src/tim.c',
         -- 'Src/dma.c',
         'Src/gpio.c',
         'Src/main.c',
-        --[[ 'Src/spi.c',
-        'Src/stm32f4xx_hal_msp.c',
+        --[[ 'Src/stm32f4xx_hal_msp.c',
         'Src/stm32f4xx_hal_timebase_TIM.c', ]]
         'Src/stm32f4xx_it.c',
         'Src/system_stm32f4xx.c',
         'Src/usart.c',
+        'Src/spi.c',
         --[[ 'Src/usb_device.c',
         'Src/usbd_cdc_if.c',
         'Src/usbd_conf.c',
         'Src/adc.c',        
         'Src/usbd_desc.c',
         'Src/can.c',   ]]
-        --'Src/i2c.c',
+        --'Src/i2c.c',      
     },
     cflags = {'-DSTM32F405xx', '-DHW_VERSION_MAJOR=3'},    
     ldflags = {
@@ -198,8 +189,6 @@ boards = {
     ["v3.5-48V"] = {include={board_v3}, cflags={"-DHW_VERSION_MINOR=5 -DHW_VERSION_VOLTAGE=48"}},
     ["v3.6-24V"] = {include={board_v3}, cflags={"-DHW_VERSION_MINOR=6 -DHW_VERSION_VOLTAGE=24"}},
     ["v3.6-56V"] = {include={board_v3}, cflags={"-DHW_VERSION_MINOR=6 -DHW_VERSION_VOLTAGE=56"}},
-    ["v4.0-56V"] = {include={board_v4}, cflags={"-DHW_VERSION_MINOR=0 -DHW_VERSION_VOLTAGE=56"}},
-    ["v4.1-58V"] = {include={board_v4}, cflags={"-DHW_VERSION_MINOR=1 -DHW_VERSION_VOLTAGE=58"}},
 }
 
 

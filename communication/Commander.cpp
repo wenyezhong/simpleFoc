@@ -4,6 +4,7 @@
 
 // Commander command = Commander(Serial);
 Commander *pCommander;
+
 void recvTask(uint8_t ch)
 {
   // int ch ;//= serial.read();
@@ -49,7 +50,7 @@ void Commander::add(char id, CommandCallback onCommand, char* label ){
 
 void Commander::run(){
   if(!com_port) return;
-  run(*com_port, eol);
+  // run(*com_port, eol);
 }
 
 /* void Commander::run(Print& serial, char eol){
@@ -78,11 +79,11 @@ void Commander::run(){
         received_chars[0] = 0;
         rec_cnt=0;
     }
-  } */
+  } 
 
   com_port = tmp; // reset the instance to the internal value
   this->eol = eol_tmp;
-}
+}*/
 
 void Commander::run(char* user_input){
   // execute the user command

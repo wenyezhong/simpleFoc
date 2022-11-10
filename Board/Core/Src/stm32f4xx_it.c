@@ -206,13 +206,13 @@ void UART4_IRQHandler(void)
   /* USER CODE BEGIN UART4_IRQn 0 */
   uint8_t recDat;
   /* USER CODE END UART4_IRQn 0 */
-  HAL_UART_IRQHandler(&huart4);
+  // HAL_UART_IRQHandler(&huart4);
   /* USER CODE BEGIN UART4_IRQn 1 */
   uint32_t isrflags   = READ_REG(huart4.Instance->SR);
   if ((isrflags & USART_SR_RXNE) != RESET)
   {
     recDat = (uint8_t)(huart4.Instance->DR & (uint8_t)0x00FF);
-    // recvTask(recDat);
+    recvTask(recDat);
   }
 
   /* USER CODE END UART4_IRQn 1 */

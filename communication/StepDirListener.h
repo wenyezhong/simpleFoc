@@ -1,7 +1,7 @@
 #ifndef STEPDIR_H
 #define STEPDIR_H
 
-#include "Arduino.h"
+// #include "Arduino.h"
 #include "../common/foc_utils.h"
 
 
@@ -9,6 +9,7 @@
 #define PinStatus int
 #endif
 
+#define RISING 1
 
 /**
  * Step/Dir listenner class for easier interraction with this communication interface.

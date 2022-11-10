@@ -17,6 +17,6 @@ void _delay(unsigned long ms);
  * hardware specific
  */
 unsigned long _micros();
-
-
+void delay(unsigned long dly);
+void delayMicroseconds(unsigned long dly);
 #endif

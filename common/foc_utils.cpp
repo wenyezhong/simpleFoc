@@ -1,5 +1,5 @@
 #include "foc_utils.h"
-
+#include <math.h>
 // int array instead of float array
 // 4x200 points per 360 deg
 // 2x storage save (int 2Byte float 4 Byte )

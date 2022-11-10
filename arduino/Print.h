@@ -25,6 +25,7 @@
 #include <inttypes.h>
 #include <stdio.h> // for size_t
 #include <string.h>
+#include "Printable.h"
 
 #define DEC 10
 #define HEX 16
@@ -33,7 +34,7 @@
 #undef BIN
 #endif
 #define BIN 2
-
+#define F 
 
 extern "C" {
 #endif
@@ -41,6 +42,7 @@ extern "C" {
 void test(void);
 #ifdef __cplusplus
 }
+
 class Print
 {
   private:
@@ -79,7 +81,7 @@ class Print
     size_t print(long, int = DEC);
     size_t print(unsigned long, int = DEC);
     size_t print(double, int = 2);
-    // size_t print(const Printable&);
+    size_t print(const Printable&);
    
     size_t println(const char[]);
     size_t println(char);
@@ -89,7 +91,9 @@ class Print
     size_t println(long, int = DEC);
     size_t println(unsigned long, int = DEC);
     size_t println(double, int = 2);
-    // size_t println(const Printable&);
+    size_t println(const Printable&);
+    // size_t println(const String &s);
+ 
     size_t println(void);
 
     virtual void flush() { /* Empty implementation for backward compatibility */ }

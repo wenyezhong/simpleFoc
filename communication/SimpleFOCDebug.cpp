@@ -9,7 +9,6 @@ void testSimpleFOCDebug(void)
 }
 
 Print* SimpleFOCDebug::_debugPrint = NULL;
-// Print* SimpleFOCDebug::_debugPrint = NULL;
 
 void SimpleFOCDebug::enable(Print* debugPrint) {
     _debugPrint = debugPrint;

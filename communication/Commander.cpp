@@ -1,9 +1,37 @@
 #include "Commander.h"
+#include <stdlib.h>
+#include <ctype.h>
 
-Commander::Commander(Stream& serial, char eol, bool echo){
+// Commander command = Commander(Serial);
+Commander *pCommander;
+void recvTask(uint8_t ch)
+{
+  // int ch ;//= serial.read();
+  if(pCommander->com_port!=nullptr)
+  {
+    pCommander->received_chars[pCommander->rec_cnt++] = (char)ch;
+    // end of user input
+    if(pCommander->echo)
+      pCommander->print((char)ch);
+    if (pCommander->isSentinel(ch)) {
+      // execute the user command
+      pCommander->run(pCommander->received_chars);
+      // reset the command buffer
+      pCommander->received_chars[0] = 0;
+      pCommander->rec_cnt=0;
+    }
+    if (pCommander->rec_cnt>=MAX_COMMAND_LENGTH) { // prevent buffer overrun if message is too long
+        pCommander->received_chars[0] = 0;
+        pCommander->rec_cnt=0;
+    }
+  }
+}
+
+Commander::Commander(Print& serial, char eol, bool echo){
   com_port = &serial;
   this->eol = eol;
   this->echo = echo;
+  pCommander = this;
 }
 Commander::Commander(char eol, bool echo){
   this->eol = eol;
@@ -24,16 +52,17 @@ void Commander::run(){
   run(*com_port, eol);
 }
 
-void Commander::run(Stream& serial, char eol){
-  Stream* tmp = com_port; // save the serial instance
+/* void Commander::run(Print& serial, char eol){
+  Print* tmp = com_port; // save the serial instance
   char eol_tmp = this->eol;
   this->eol = eol;
   com_port = &serial;
 
   // a string to hold incoming data
-  while (serial.available()) {
+  // while (serial.available()) {
+  while (1) {
     // get the new byte:
-    int ch = serial.read();
+    int ch ;//= serial.read();
     received_chars[rec_cnt++] = (char)ch;
     // end of user input
     if(echo)
@@ -41,7 +70,6 @@ void Commander::run(Stream& serial, char eol){
     if (isSentinel(ch)) {
       // execute the user command
       run(received_chars);
-
       // reset the command buffer
       received_chars[0] = 0;
       rec_cnt=0;
@@ -50,7 +78,7 @@ void Commander::run(Stream& serial, char eol){
         received_chars[0] = 0;
         rec_cnt=0;
     }
-  }
+  } */
 
   com_port = tmp; // reset the instance to the internal value
   this->eol = eol_tmp;
@@ -100,7 +128,7 @@ void Commander::run(char* user_input){
 void Commander::motor(FOCMotor* motor, char* user_command) {
 
   // if target setting
-  if(isDigit(user_command[0]) || user_command[0] == '-' || user_command[0] == '+'){
+  if(isdigit(user_command[0]) || user_command[0] == '-' || user_command[0] == '+'){
     target(motor, user_command);
     return;
   }
@@ -339,10 +367,10 @@ void Commander::motion(FOCMotor* motor, char* user_cmd, char* separator){
 
   switch(cmd){
     case CMD_MOTION_TYPE:
-      printVerbose(F("Motion:"));
+      printVerbose("Motion:");
       switch(sub_cmd){
         case SCMD_DOWNSAMPLE:
-            printVerbose(F(" downsample: "));
+            printVerbose(" downsample: ");
             if(!GET) motor->motion_downsample = value;
             println((int)motor->motion_downsample);
           break;
@@ -352,10 +380,10 @@ void Commander::motion(FOCMotor* motor, char* user_cmd, char* separator){
             motor->controller = (MotionControlType)value;
           switch(motor->controller){
             case MotionControlType::torque:
-              println(F("torque"));
+              println("torque");
               break;
             case MotionControlType::velocity:
-              println(F("vel"));
+              println("vel");
               break;
             case MotionControlType::angle:
               println(F("angle"));
@@ -577,10 +605,7 @@ void Commander::print(const char* message){
   if(!com_port || verbose == VerboseMode::nothing ) return;
   com_port->print(message);
 }
-void Commander::print(const __FlashStringHelper *message){
-  if(!com_port || verbose == VerboseMode::nothing ) return;
-  com_port->print(message);
-}
+
 void Commander::print(const char message){
   if(!com_port || verbose == VerboseMode::nothing ) return;
   com_port->print(message);
@@ -598,10 +623,7 @@ void Commander::println(const char* message){
   if(!com_port || verbose == VerboseMode::nothing ) return;
   com_port->println(message);
 }
-void Commander::println(const __FlashStringHelper *message){
-  if(!com_port || verbose == VerboseMode::nothing ) return;
-  com_port->println(message);
-}
+
 void Commander::println(const char message){
   if(!com_port || verbose == VerboseMode::nothing ) return;
   com_port->println(message);
@@ -611,9 +633,7 @@ void Commander::println(const char message){
 void Commander::printVerbose(const char* message){
   if(verbose == VerboseMode::user_friendly) print(message);
 }
-void Commander::printVerbose(const __FlashStringHelper *message){
-  if(verbose == VerboseMode::user_friendly) print(message);
-}
+
 void Commander::printError(){
  println(F("err"));
 }

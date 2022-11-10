@@ -34,6 +34,9 @@
 #include <string.h>
 #include "Print.h"
 
+
+#ifndef SIMPLEFOC_DISABLE_DEBUG
+
 #ifdef __cplusplus
 
 extern "C" {
@@ -43,11 +46,8 @@ void testSimpleFOCDebug(void);
 
 #ifdef __cplusplus
 }
-// #include "hwSerial.h"
 
-#ifndef SIMPLEFOC_DISABLE_DEBUG
 
-// extern HardwareSerial Serial;
 
 class SimpleFOCDebug {
 public:

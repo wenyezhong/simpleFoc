@@ -2,7 +2,7 @@
 #define SENSOR_H
 
 #include <inttypes.h>
-
+#include <math.h>
 /**
  *  Direction structure
  */

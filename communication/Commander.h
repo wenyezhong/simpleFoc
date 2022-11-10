@@ -1,7 +1,6 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 
-#include "Arduino.h"
 #include "../common/base_classes/FOCMotor.h"
 #include "../common/pid.h"
 #include "../common/lowpass_filter.h"
@@ -45,7 +44,7 @@ class Commander
      * @param eol - the end of line sentinel character
      * @param echo - echo last typed character (for command line feedback)
      */
-    Commander(Stream &serial, char eol = '\n', bool echo = false);
+    Commander(Print &serial, char eol = '\n', bool echo = false);
     Commander(char eol = '\n', bool echo = false);
 
     /**
@@ -70,7 +69,7 @@ class Commander
      * @param reader - temporary stream to read user input
      * @param eol - temporary end of line sentinel
      */
-    void run(Stream &reader, char eol = '\n');
+    // void run(Print &reader, char eol = '\n');
     /**
      * Function reading the string of user input and firing callbacks that have been added to the commander
      * once the user has requested them - when he sends the command
@@ -97,10 +96,10 @@ class Commander
     uint8_t decimal_places = 3; //!< number of decimal places to be used when displaying numbers
 
     // monitoring functions
-    Stream* com_port = nullptr; //!< Serial terminal variable if provided
+    Print* com_port = nullptr; //!< Serial terminal variable if provided
     char eol = '\n'; //!< end of line sentinel character
     bool echo = false; //!< echo last typed character (for command line feedback)
-
+    
     /**
      *
      * FOC motor (StepperMotor and BLDCMotor) command interface
@@ -246,9 +245,7 @@ class Commander
     char* call_label[20]; //!< added callback labels
     int call_count = 0;//!< number callbacks that are subscribed
 
-    // helping variable for serial communication reading
-    char received_chars[MAX_COMMAND_LENGTH] = {0}; //!< so far received user message - waiting for newline
-    int rec_cnt = 0; //!< number of characters receives
+    
 
     // serial printing functions
     /**
@@ -261,7 +258,7 @@ class Commander
      *  - Function handling the case for strings defined by F macro
      *  @param message - message to be printed
      */
-    void printVerbose(const __FlashStringHelper *message);
+    
     /**
      *  print the numbers to the serial with desired decimal point number
      *  @param message - number to be printed
@@ -270,18 +267,31 @@ class Commander
 
     void print(const float number);
     void print(const int number);
-    void print(const char* message);
-    void print(const __FlashStringHelper *message);
-    void print(const char message);
+    void print(const char* message);    
+    // void print(const char message);
     void println(const float number);
     void println(const int number);
-    void println(const char* message);
-    void println(const __FlashStringHelper *message);
+    void println(const char* message);    
     void println(const char message);
-
     void printError();
-    bool isSentinel(char ch);
+    
+public:
+// helping variable for serial communication reading
+    char received_chars[MAX_COMMAND_LENGTH] = {0}; //!< so far received user message - waiting for newline
+    int rec_cnt = 0; //!< number of characters receives
+    void print(const char message);   
+    bool isSentinel(char ch); 
 };
 
+#ifdef __cplusplus
+
+extern "C" {
+#endif
+
+void recvTask(uint8_t ch);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

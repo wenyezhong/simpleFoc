@@ -57,8 +57,8 @@ size_t Print::write(const uint8_t *buffer, size_t size)
 /* size_t Print::print(const String &s)
 {
   return write(s.c_str(), s.length());
-}
- */
+} */
+
 size_t Print::print(const char str[])
 {
   return write(str);
@@ -113,11 +113,11 @@ size_t Print::print(double n, int digits)
 
 
 
-/* size_t Print::print(const Printable& x)
+size_t Print::print(const Printable& x)
 {
   return x.printTo(*this);
 }
- */
+
 size_t Print::println(void)
 {
   return write("\r\n");
@@ -186,12 +186,12 @@ size_t Print::println(double num, int digits)
   return n;
 }
 
-/* size_t Print::println(const Printable& x)
+size_t Print::println(const Printable& x)
 {
   size_t n = print(x);
   n += println();
   return n;
-} */
+}
 
 // Private Methods /////////////////////////////////////////////////////////////
 

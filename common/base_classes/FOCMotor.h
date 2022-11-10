@@ -10,6 +10,7 @@
 #include "../defaults.h"
 #include "../pid.h"
 #include "../lowpass_filter.h"
+#include "Print.h"
 
 
 // monitoring bitmap

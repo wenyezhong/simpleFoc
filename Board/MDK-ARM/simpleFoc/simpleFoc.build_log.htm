@@ -1,0 +1,189 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: ¦ÌVision V5.29.0.0
+Copyright (C) 2019 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: yz wen, WolfGroup, LIC=VGXG8-3XJ4I-WFTI7-EPSJU-Z5PIE-PLTHF
+ 
+Tool Versions:
+Toolchain:       MDK-ARM Plus  Version: 5.29.0.0
+Toolchain Path:  C:\Keil_v5\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.06 update 6 (build 750)
+Assembler:       Armasm.exe V5.06 update 6 (build 750)
+Linker/Locator:  ArmLink.exe V5.06 update 6 (build 750)
+Library Manager: ArmAr.exe V5.06 update 6 (build 750)
+Hex Converter:   FromElf.exe V5.06 update 6 (build 750)
+CPU DLL:         SARMCM3.DLL V5.29.0.0
+Dialog DLL:      DCM.DLL V1.17.3.0
+Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.0.7.0
+Dialog DLL:      TCM.DLL V1.36.5.0
+ 
+<h2>Project:</h2>
+D:\keil_prj\simpleFoc\Board\MDK-ARM\simpleFoc.uvprojx
+Project File Date:  11/08/2022
+
+<h2>Output:</h2>
+*** Using Compiler 'V5.06 update 6 (build 750)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
+*** Warning: You are compiling one or more files of source type C++ and have selected 'use MicroLIB'. MicroLIB does not support C++!
+  
+Build target 'simpleFoc'
+compiling Print.cpp...
+..\..\arduino\Arduino.h(127): error:  #20: identifier "uint8_t" is undefined
+  typedef uint8_t byte;
+..\..\arduino\Arduino.h(134): error:  #20: identifier "uint8_t" is undefined
+  void pinMode(uint8_t pin, uint8_t mode);
+..\..\arduino\Arduino.h(134): error:  #20: identifier "uint8_t" is undefined
+  void pinMode(uint8_t pin, uint8_t mode);
+..\..\arduino\Arduino.h(135): error:  #20: identifier "uint8_t" is undefined
+  void digitalWrite(uint8_t pin, uint8_t val);
+..\..\arduino\Arduino.h(135): error:  #20: identifier "uint8_t" is undefined
+  void digitalWrite(uint8_t pin, uint8_t val);
+..\..\arduino\Arduino.h(136): error:  #20: identifier "uint8_t" is undefined
+  int digitalRead(uint8_t pin);
+..\..\arduino\Arduino.h(137): error:  #20: identifier "uint8_t" is undefined
+  int analogRead(uint8_t pin);
+..\..\arduino\Arduino.h(138): error:  #20: identifier "uint8_t" is undefined
+  void analogReference(uint8_t mode);
+..\..\arduino\Arduino.h(139): error:  #20: identifier "uint8_t" is undefined
+  void analogWrite(uint8_t pin, int val);
+..\..\arduino\Arduino.h(145): error:  #20: identifier "uint8_t" is undefined
+  unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
+..\..\arduino\Arduino.h(145): error:  #20: identifier "uint8_t" is undefined
+  unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
+..\..\arduino\Arduino.h(146): error:  #20: identifier "uint8_t" is undefined
+  unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout);
+..\..\arduino\Arduino.h(146): error:  #20: identifier "uint8_t" is undefined
+  unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout);
+..\..\arduino\Arduino.h(148): error:  #20: identifier "uint8_t" is undefined
+  void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val);
+..\..\arduino\Arduino.h(148): error:  #20: identifier "uint8_t" is undefined
+  void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val);
+..\..\arduino\Arduino.h(148): error:  #20: identifier "uint8_t" is undefined
+  void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val);
+..\..\arduino\Arduino.h(148): error:  #20: identifier "uint8_t" is undefined
+  void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val);
+..\..\arduino\Arduino.h(149): error:  #20: identifier "uint8_t" is undefined
+  uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder);
+..\..\arduino\Arduino.h(149): error:  #20: identifier "uint8_t" is undefined
+  uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder);
+..\..\arduino\Arduino.h(149): error:  #20: identifier "uint8_t" is undefined
+  uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder);
+..\..\arduino\Arduino.h(149): error:  #20: identifier "uint8_t" is undefined
+  uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder);
+..\..\arduino\Arduino.h(151): error:  #20: identifier "uint8_t" is undefined
+  void attachInterrupt(uint8_t interruptNum, void (*userFunc)(void), int mode);
+..\..\arduino\Arduino.h(152): error:  #20: identifier "uint8_t" is undefined
+  void detachInterrupt(uint8_t interruptNum);
+..\..\arduino\Arduino.h(164): error:  #20: identifier "uint16_t" is undefined
+  extern const uint16_t PROGMEM port_to_mode_PGM[];
+KB: Unexpected type: 0
+error type>(164): error:  #65: expected a ";"
+  extern const uint16_t PROGMEM port_to_mode_PGM[];
+..\..\arduino\Arduino.h(165): error:  #20: identifier "uint16_t" is undefined
+  extern const uint16_t PROGMEM port_to_input_PGM[];
+KB: Unexpected type: 0
+error type>(165): error:  #65: expected a ";"
+  extern const uint16_t PROGMEM port_to_input_PGM[];
+..\..\arduino\Arduino.h(166): error:  #20: identifier "uint16_t" is undefined
+  extern const uint16_t PROGMEM port_to_output_PGM[];
+KB: Unexpected type: 0
+error type>(166): error:  #65: expected a ";"
+  extern const uint16_t PROGMEM port_to_output_PGM[];
+..\..\arduino\Arduino.h(168): error:  #20: identifier "uint8_t" is undefined
+  extern const uint8_t PROGMEM digital_pin_to_port_PGM[];
+..\..\arduino\Print.cpp: 0 warnings, 30 errors
+compiling Print.cpp...
+..\..\arduino\Arduino.h(127): error:  #20: identifier "uint8_t" is undefined
+  typedef uint8_t byte;
+..\..\arduino\Arduino.h(134): error:  #20: identifier "uint8_t" is undefined
+  void pinMode(uint8_t pin, uint8_t mode);
+..\..\arduino\Arduino.h(134): error:  #20: identifier "uint8_t" is undefined
+  void pinMode(uint8_t pin, uint8_t mode);
+..\..\arduino\Arduino.h(135): error:  #20: identifier "uint8_t" is undefined
+  void digitalWrite(uint8_t pin, uint8_t val);
+..\..\arduino\Arduino.h(135): error:  #20: identifier "uint8_t" is undefined
+  void digitalWrite(uint8_t pin, uint8_t val);
+..\..\arduino\Arduino.h(136): error:  #20: identifier "uint8_t" is undefined
+  int digitalRead(uint8_t pin);
+..\..\arduino\Arduino.h(137): error:  #20: identifier "uint8_t" is undefined
+  int analogRead(uint8_t pin);
+..\..\arduino\Arduino.h(138): error:  #20: identifier "uint8_t" is undefined
+  void analogReference(uint8_t mode);
+..\..\arduino\Arduino.h(139): error:  #20: identifier "uint8_t" is undefined
+  void analogWrite(uint8_t pin, int val);
+..\..\arduino\Arduino.h(145): error:  #20: identifier "uint8_t" is undefined
+  unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
+..\..\arduino\Arduino.h(145): error:  #20: identifier "uint8_t" is undefined
+  unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
+..\..\arduino\Arduino.h(146): error:  #20: identifier "uint8_t" is undefined
+  unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout);
+..\..\arduino\Arduino.h(146): error:  #20: identifier "uint8_t" is undefined
+  unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout);
+..\..\arduino\Arduino.h(148): error:  #20: identifier "uint8_t" is undefined
+  void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val);
+..\..\arduino\Arduino.h(148): error:  #20: identifier "uint8_t" is undefined
+  void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val);
+..\..\arduino\Arduino.h(148): error:  #20: identifier "uint8_t" is undefined
+  void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val);
+..\..\arduino\Arduino.h(148): error:  #20: identifier "uint8_t" is undefined
+  void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val);
+..\..\arduino\Arduino.h(149): error:  #20: identifier "uint8_t" is undefined
+  uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder);
+..\..\arduino\Arduino.h(149): error:  #20: identifier "uint8_t" is undefined
+  uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder);
+..\..\arduino\Arduino.h(149): error:  #20: identifier "uint8_t" is undefined
+  uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder);
+..\..\arduino\Arduino.h(149): error:  #20: identifier "uint8_t" is undefined
+  uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder);
+..\..\arduino\Arduino.h(151): error:  #20: identifier "uint8_t" is undefined
+  void attachInterrupt(uint8_t interruptNum, void (*userFunc)(void), int mode);
+..\..\arduino\Arduino.h(152): error:  #20: identifier "uint8_t" is undefined
+  void detachInterrupt(uint8_t interruptNum);
+..\..\arduino\Arduino.h(164): error:  #20: identifier "uint16_t" is undefined
+  extern const uint16_t PROGMEM port_to_mode_PGM[];
+KB: Unexpected type: 0
+error type>(164): error:  #65: expected a ";"
+  extern const uint16_t PROGMEM port_to_mode_PGM[];
+..\..\arduino\Arduino.h(165): error:  #20: identifier "uint16_t" is undefined
+  extern const uint16_t PROGMEM port_to_input_PGM[];
+KB: Unexpected type: 0
+error type>(165): error:  #65: expected a ";"
+  extern const uint16_t PROGMEM port_to_input_PGM[];
+..\..\arduino\Arduino.h(166): error:  #20: identifier "uint16_t" is undefined
+  extern const uint16_t PROGMEM port_to_output_PGM[];
+KB: Unexpected type: 0
+error type>(166): error:  #65: expected a ";"
+  extern const uint16_t PROGMEM port_to_output_PGM[];
+..\..\arduino\Arduino.h(168): error:  #20: identifier "uint8_t" is undefined
+  extern const uint8_t PROGMEM digital_pin_to_port_PGM[];
+..\..\arduino\Print.cpp: 0 warnings, 30 errors
+"simpleFoc\simpleFoc.axf" - 60 Error(s), 0 Warning(s).
+
+<h2>Software Packages used:</h2>
+
+Package Vendor: ARM
+                http://www.keil.com/pack/ARM.CMSIS.5.6.0.pack
+                ARM.CMSIS.5.6.0
+                CMSIS (Cortex Microcontroller Software Interface Standard)
+   * Component: CORE Version: 5.3.0
+
+Package Vendor: Keil
+                http://www.keil.com/pack/Keil.STM32F4xx_DFP.2.15.0.pack
+                Keil.STM32F4xx_DFP.2.15.0
+                STMicroelectronics STM32F4 Series Device Support, Drivers and Examples
+
+<h2>Collection of Component include folders:</h2>
+  .\RTE\_simpleFoc
+  C:\Users\Administrator\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include
+  C:\Users\Administrator\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.15.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include
+
+<h2>Collection of Component Files used:</h2>
+
+   * Component: ARM::CMSIS:CORE:5.3.0
+Target not created.
+Build Time Elapsed:  00:00:00
+</pre>
+</body>
+</html>

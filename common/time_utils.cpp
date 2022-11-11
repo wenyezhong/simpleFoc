@@ -13,10 +13,10 @@ void delay(unsigned long dly)
 void delayMicroseconds(unsigned long dly)
 {
   unsigned long t = _micros() + dly;
-  if(t>=5000)
+  if(t>=50000)
   {
-    t -= 5000;
-    while(_micros() < 5000){};
+    t -= 50000;
+    while(_micros() < 50000){};
     while(_micros() < t){};
   }
   else
@@ -31,10 +31,10 @@ void delayMicroseconds(unsigned long dly)
 void _delay(unsigned long ms){
 
   unsigned long t = _micros() + ms*1000;
-  if(t>=5000)
+  if(t>=50000)
   {
-    t -= 5000;
-    while(_micros() < 5000){};
+    t -= 50000;
+    while(_micros() < 50000){};
     while(_micros() < t){};
   }
   else

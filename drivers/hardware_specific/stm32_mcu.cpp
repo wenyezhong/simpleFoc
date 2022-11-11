@@ -1,8 +1,91 @@
 
 #include "../hardware_api.h"
 #include "stm32_mcu.h"
+#include "tim.h"
+#include "adc.h"
 
-#if defined(_STM32_DEF_)
+/* Function implementations --------------------------------------------------*/
+void start_pwm(TIM_HandleTypeDef* htim) {
+    // Init PWM
+    /* int half_load = TIM_1_8_PERIOD_CLOCKS / 2;
+    htim->Instance->CCR1 = half_load;
+    htim->Instance->CCR2 = half_load;
+    htim->Instance->CCR3 = half_load;
+
+    // This hardware obfustication layer really is getting on my nerves
+    HAL_TIM_PWM_Start(htim, TIM_CHANNEL_1);
+    // HAL_TIMEx_PWMN_Start(htim, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Start(htim, TIM_CHANNEL_2);
+    // HAL_TIMEx_PWMN_Start(htim, TIM_CHANNEL_2);
+    HAL_TIM_PWM_Start(htim, TIM_CHANNEL_3); */
+    // HAL_TIMEx_PWMN_Start(htim, TIM_CHANNEL_3);
+
+    // htim->Instance->CCR4 = 1;
+    // HAL_TIM_PWM_Start_IT(htim, TIM_CHANNEL_4);
+}
+
+void start_adc_pwm() {
+    // Enable ADC and interrupts
+    // __HAL_ADC_ENABLE(&hadc1);
+    __HAL_ADC_ENABLE(&hadc2);
+    // __HAL_ADC_ENABLE(&hadc3);
+    // Warp field stabilize.
+    _delay(2);
+    // __HAL_ADC_ENABLE_IT(&hadc1, ADC_IT_JEOC);
+    __HAL_ADC_ENABLE_IT(&hadc2, ADC_IT_JEOC);
+    // __HAL_ADC_ENABLE_IT(&hadc3, ADC_IT_JEOC);
+    // __HAL_ADC_ENABLE_IT(&hadc2, ADC_IT_EOC);
+    // __HAL_ADC_ENABLE_IT(&hadc3, ADC_IT_EOC);
+
+    // Ensure that debug halting of the core doesn't leave the motor PWM running
+    // __HAL_DBGMCU_FREEZE_TIM1();
+    // __HAL_DBGMCU_FREEZE_TIM8();
+    // __HAL_DBGMCU_FREEZE_TIM13();
+
+    // start_pwm(&htim1);
+    // start_pwm(&htim8);
+    // TODO: explain why this offset
+    // sync_timers(&htim1, &htim8, TIM_CLOCKSOURCE_ITR0, TIM_1_8_PERIOD_CLOCKS / 2 - 1 * 128,&htim13);
+    // htim_a->Instance->BDTR &= ~(TIM_BDTR_MOE);
+    // htim_a->Instance->BDTR |= (TIM_BDTR_MOE);
+    // Motor output starts in the disabled state
+    // __HAL_TIM_MOE_DISABLE_UNCONDITIONALLY(&htim1);
+    // __HAL_TIM_MOE_DISABLE_UNCONDITIONALLY(&htim8);
+
+    // Enable the update interrupt (used to coherently sample GPIO)
+    __HAL_TIM_ENABLE_IT(&htim1, TIM_IT_UPDATE);
+    // __HAL_TIM_ENABLE_IT(&htim8, TIM_IT_UPDATE);
+
+    // Start brake resistor PWM in floating output configuration
+    /* htim2.Instance->CCR3 = 0;
+    htim2.Instance->CCR4 = TIM_APB1_PERIOD_CLOCKS + 1;
+    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
+    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4); */
+}
+// function setting the high pwm frequency to the supplied pins
+// - BLDC motor - 3PWM setting
+// - hardware speciffic
+void* _configure3PWM(long pwm_frequency,const int pinA, const int pinB, const int pinC) 
+{
+ 
+  start_adc_pwm();
+  return 0;
+}
+
+void _writeDutyCycle3PWM(float dc_a,  float dc_b, float dc_c, void* params){
+  // transform duty cycle from [0,1] to [0,3500]
+
+  __HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_1,(uint16_t)3500*dc_a);
+  __HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_2,(uint16_t)3500*dc_b);
+  __HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_3,(uint16_t)3500*dc_c);
+  // _setPwm(((STM32DriverParams*)params)->timers[0], ((STM32DriverParams*)params)->channels[0], _PWM_RANGE*dc_a, _PWM_RESOLUTION);
+  // _setPwm(((STM32DriverParams*)params)->timers[1], ((STM32DriverParams*)params)->channels[1], _PWM_RANGE*dc_b, _PWM_RESOLUTION);
+  // _setPwm(((STM32DriverParams*)params)->timers[2], ((STM32DriverParams*)params)->channels[2], _PWM_RANGE*dc_c, _PWM_RESOLUTION);
+}
+
+
+#if 0
+// #if defined(_STM32_DEF_)
 
 
 //#define SIMPLEFOC_STM32_DEBUG

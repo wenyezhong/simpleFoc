@@ -37,7 +37,7 @@
 
 #ifndef SIMPLEFOC_DISABLE_DEBUG
 
-#ifdef __cplusplus
+/* #ifdef __cplusplus
 
 extern "C" {
 #endif
@@ -45,7 +45,7 @@ extern "C" {
 void testSimpleFOCDebug(void);
 
 #ifdef __cplusplus
-}
+} */
 
 
 
@@ -84,6 +84,6 @@ protected:
 
 #endif //ifndef SIMPLEFOC_DISABLE_DEBUG
 
-#endif 
+// #endif 
 #endif
 

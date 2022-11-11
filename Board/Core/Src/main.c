@@ -18,9 +18,12 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
+#include "dma.h"
 #include "spi.h"
 #include "tim.h"
 #include "usart.h"
+#include "usb_device.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -103,9 +106,15 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_UART4_Init();
   MX_TIM6_Init();
   MX_SPI3_Init();
+  MX_ADC1_Init();
+  MX_TIM1_Init();
+  MX_ADC2_Init();
+  MX_ADC3_Init();
+  MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
   printf("hello my simplefoc coming...\r\n");
   printf("SystemCoreClock = %lu\r\n",SystemCoreClock);
@@ -119,9 +128,11 @@ int main(void)
   simpleFOCDrive_main();
   while (1)
   {
+    motorTask();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
   }
   /* USER CODE END 3 */
 }
@@ -150,7 +161,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLM = 4;
   RCC_OscInitStruct.PLL.PLLN = 168;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-  RCC_OscInitStruct.PLL.PLLQ = 4;
+  RCC_OscInitStruct.PLL.PLLQ = 7;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();

@@ -2,11 +2,11 @@
 
 #ifndef SIMPLEFOC_DISABLE_DEBUG
 
-void testSimpleFOCDebug(void)
+/* void testSimpleFOCDebug(void)
 {
     SimpleFOCDebug::enable();
     SIMPLEFOC_DEBUG("hello SIMPLEFOC_DEBUG test\r\n");
-}
+} */
 
 Print* SimpleFOCDebug::_debugPrint = NULL;
 

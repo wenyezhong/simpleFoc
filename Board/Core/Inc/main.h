@@ -57,12 +57,40 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define TIM_1_8_PERIOD_CLOCKS 3500
+#define TIM_APB1_CLOCK_HZ 84000000
+#define TIM_APB1_PERIOD_CLOCKS 4096
+#define TIM_1_8_RCR 2
+#define TIM_1_8_DEADTIME_CLOCKS 20
+#define TIM_1_8_CLOCK_HZ 168000000
 #define M0_nCS_Pin GPIO_PIN_13
 #define M0_nCS_GPIO_Port GPIOC
 #define M1_nCS_Pin GPIO_PIN_14
 #define M1_nCS_GPIO_Port GPIOC
+#define M0_IB_Pin GPIO_PIN_0
+#define M0_IB_GPIO_Port GPIOC
+#define M0_IC_Pin GPIO_PIN_1
+#define M0_IC_GPIO_Port GPIOC
+#define M1_IC_Pin GPIO_PIN_2
+#define M1_IC_GPIO_Port GPIOC
+#define M1_IB_Pin GPIO_PIN_3
+#define M1_IB_GPIO_Port GPIOC
+#define M1_TEMP_Pin GPIO_PIN_4
+#define M1_TEMP_GPIO_Port GPIOA
+#define AUX_TEMP_Pin GPIO_PIN_5
+#define AUX_TEMP_GPIO_Port GPIOA
+#define VBUS_S_Pin GPIO_PIN_6
+#define VBUS_S_GPIO_Port GPIOA
+#define M0_TEMP_Pin GPIO_PIN_5
+#define M0_TEMP_GPIO_Port GPIOC
 #define EN_GATE_Pin GPIO_PIN_12
 #define EN_GATE_GPIO_Port GPIOB
+#define M0_AH_Pin GPIO_PIN_8
+#define M0_AH_GPIO_Port GPIOA
+#define M0_BH_Pin GPIO_PIN_9
+#define M0_BH_GPIO_Port GPIOA
+#define M0_CH_Pin GPIO_PIN_10
+#define M0_CH_GPIO_Port GPIOA
 #define GPIO7_Pin GPIO_PIN_15
 #define GPIO7_GPIO_Port GPIOA
 #define nFAULT_Pin GPIO_PIN_2

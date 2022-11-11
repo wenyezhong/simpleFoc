@@ -92,10 +92,11 @@ void DRV8301_setup() {
     DRV8301_setupSpi(&gate_driver_, local_regs);
 
     local_regs->Ctrl_Reg_1.OC_MODE = DRV8301_OcMode_LatchShutDown;
+    local_regs->Ctrl_Reg_1.PWM_MODE = DRV8301_PwmMode_Three_Inputs; //3 pwm模式
     // Overcurrent set to approximately 150A at 100degC. This may need tweaking.
     local_regs->Ctrl_Reg_1.OC_ADJ_SET = DRV8301_VdsLevel_0p730_V;
     local_regs->Ctrl_Reg_2.GAIN = gain_snap_down->second;
-    printf("gain_snap_down->second=%d\r\n",gain_snap_down->second); 
+    printf("gain_snap_down->second=%d\r\n",gain_snap_down->second);
     //测试drv8301 寄存器读写成功否   
     local_regs->SndCmd = true;
     // printf("Ctrl_Reg_1_Value=%4x\r\n",local_regs->Ctrl_Reg_1);
@@ -113,12 +114,78 @@ void DRV8301_setup() {
     printf("DC_CAL_CH1p2=%4x\r\n",gate_driver_regs_.Ctrl_Reg_2.DC_CAL_CH1p2);
 }
 
+
+
+
+
+
+BLDCMotor motor = BLDCMotor(7);
+void doMotion(char* cmd){ command.motion(&motor, cmd); }
+
+
 int simpleFOCDrive_main(void)
 {
     // command = *(new Commander(Serial));
-    DRV8301_setup();
-    BLDCMotor motor = BLDCMotor(7);
-    // BLDCDriver3PWM driver = BLDCDriver3PWM(5, 10, 6, 8);
+    DRV8301_setup();   
+    BLDCDriver3PWM driver = BLDCDriver3PWM(5, 10, 6, 8);
+
+    
+
+    driver.voltage_power_supply = 24;
+    driver.init();
+    // link driver
+    motor.linkDriver(&driver);
+
+    motor.controller = MotionControlType::velocity_openloop;
+
+    // contoller configuration based on the controll type
+    motor.PID_velocity.P = 0.05f;
+    motor.PID_velocity.I = 1;
+    motor.PID_velocity.D = 0;
+    // default voltage_power_supply
+    motor.voltage_limit = 24;
+
+    // velocity low pass filtering time constant
+    motor.LPF_velocity.Tf = 0.01f;
+
+    // angle loop controller
+    motor.P_angle.P = 20;
+    // angle loop velocity limit
+    motor.velocity_limit = 20;
+
+    motor.useMonitoring(Serial);
+    motor.monitor_downsample = 0; // disable intially
+    motor.monitor_variables = _MON_TARGET | _MON_VEL | _MON_ANGLE; // monitor target velocity and angle
+
+    // initialise motor
+    motor.init();
+    // align encoder and start FOC
+    motor.initFOC();
+
+    // set the inital target value
+    motor.target = 1;
+
+    // subscribe motor to the commander
+    command.add('T', doMotion, "motion control");
+    // command.add('M', doMotor, "motor");
+
+    // Run user commands to configure and the motor (find the full command list in docs.simplefoc.com)
+    Serial.println("Motor ready.");
+
+  _delay(1000);
+
     return 0;
+}
+
+void  motorTask()
+{
+  // iterative setting FOC phase voltage
+  motor.loopFOC();
+  // iterative function setting the outter loop target
+  motor.move();
+  // motor monitoring
+  motor.monitor();
+  // user communication
+  command.run();
 }
 }

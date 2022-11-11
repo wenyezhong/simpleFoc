@@ -65,6 +65,8 @@ stm32f4xx_hal_pkg = {
         'Src/stm32f4xx_hal_cortex.c',     
         'Src/stm32f4xx_hal_dma.c',
         'Src/stm32f4xx_hal_dma_ex.c',
+        'Src/stm32f4xx_hal_adc_ex.c',
+        'Src/stm32f4xx_hal_adc.c',
         'Src/stm32f4xx_hal_flash.c',
         'Src/stm32f4xx_hal_flash_ex.c',
         'Src/stm32f4xx_hal_flash_ramfunc.c',
@@ -77,7 +79,10 @@ stm32f4xx_hal_pkg = {
 		'Src/stm32f4xx_hal_tim.c',
         'Src/stm32f4xx_hal_tim_ex.c',
 		'Src/stm32f4xx_hal_exti.c',
-        'Src/stm32f4xx_hal_spi.c',       
+        'Src/stm32f4xx_hal_spi.c',
+        'Src/stm32f4xx_ll_usb.c', 
+        'Src/stm32f4xx_hal_pcd_ex.c',
+        'Src/stm32f4xx_hal_pcd.c',
     },
     cflags = {'-DARM_MATH_CM4', '-mcpu=cortex-m4', '-mfpu=fpv4-sp-d16', '-DFPU_FPV4'}
 }
@@ -91,7 +96,7 @@ cmsis_pkg = {
     ldflags = {'-LBoard/Middlewares/ST/ARM/DSP/Lib'},   
 }
 
---[[ stm32_usb_device_library_pkg = {
+stm32_usb_device_library_pkg = {
     root = 'Board/Middlewares/ST/STM32_USB_Device_Library',
     include_dirs = {
         'Core/Inc',
@@ -103,8 +108,7 @@ cmsis_pkg = {
         'Core/Src/usbd_ioreq.c',
         'Class/CDC/Src/usbd_cdc.c',
     }
-} ]]
-
+}
 simpleFoc_firmware_pkg = {
     root = '.',
     include_dirs = {
@@ -131,10 +135,10 @@ simpleFoc_firmware_pkg = {
         'common/pid.cpp',
         'common/time_utils.cpp',        
         'sensors/Encoder.cpp',
-        -- 'drivers/hardware_specific/stm32_mcu.cpp',
+        'drivers/hardware_specific/stm32_mcu.cpp',
         'MotorControl/main.cpp',
         'MotorControl/BLDCMotor.cpp',
-        -- 'drivers/BLDCDriver3PWM.cpp',
+        'drivers/BLDCDriver3PWM.cpp',
     },
     cflags = {'-D_STM32_DEF_'},  
 }
@@ -146,15 +150,17 @@ board_v3 = {
         'Inc',
         '../../drivers/DRV8301',
         'common/base_classes',
+        '../USB_DEVICE/App',
+        '../USB_DEVICE/Target',
         -- 'Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F', 
     },
     code_files = {
         '../startup_stm32f405xx.s',
         -- './Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c',
-        '../../drivers/DRV8301/drv8301.c',
-        --'board.cpp',
+        '../../drivers/DRV8301/drv8301.c', 
+        'Src/adc.c',        
         'Src/tim.c',
-        -- 'Src/dma.c',
+        'Src/dma.c',
         'Src/gpio.c',
         'Src/main.c',
         --[[ 'Src/stm32f4xx_hal_msp.c',
@@ -163,10 +169,13 @@ board_v3 = {
         'Src/system_stm32f4xx.c',
         'Src/usart.c',
         'Src/spi.c',
+        '../USB_DEVICE/App/usb_device.c',
+        '../USB_DEVICE/App/usbd_cdc_if.c',
+        '../USB_DEVICE/App/usbd_desc.c',
+        '../USB_DEVICE/Target/usbd_conf.c',
         --[[ 'Src/usb_device.c',
         'Src/usbd_cdc_if.c',
-        'Src/usbd_conf.c',
-        'Src/adc.c',        
+        'Src/usbd_conf.c',              
         'Src/usbd_desc.c',
         'Src/can.c',   ]]
         --'Src/i2c.c',      
@@ -206,7 +215,8 @@ CFLAGS += '-DUSE_HAL_DRIVER'
 CFLAGS += '-mthumb'
 CFLAGS += '-mfloat-abi=hard'
 CFLAGS += '-Wno-psabi' -- suppress unimportant note about ABI compatibility in GCC 10
-CFLAGS += { '-Wall', '-Wdouble-promotion', '-Wfloat-conversion', '-fdata-sections', '-ffunction-sections'}
+-- CFLAGS += { '-Wall', '-Wdouble-promotion', '-Wfloat-conversion', '-fdata-sections', '-ffunction-sections'}
+CFLAGS += { '-w', '-Wdouble-promotion', '-Wfloat-conversion', '-fdata-sections', '-ffunction-sections'}
 CFLAGS += '-g'
 CFLAGS += '-DFIBRE_ENABLE_SERVER'
 CFLAGS += '-Wno-nonnull'
@@ -287,7 +297,7 @@ print('Using python command "'..python_command..'"')
 add_pkg(board)
 -- add_pkg(freertos_pkg)
 add_pkg(cmsis_pkg)
--- add_pkg(stm32_usb_device_library_pkg)
+add_pkg(stm32_usb_device_library_pkg)
 --add_pkg(fibre_pkg)
 add_pkg(simpleFoc_firmware_pkg)
 

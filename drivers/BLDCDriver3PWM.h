@@ -49,6 +49,7 @@ class BLDCDriver3PWM: public BLDCDriver
     */
     void setPwm(float Ua, float Ub, float Uc) override;
 
+
     /** 
      * Set phase voltages to the harware 
      * 

@@ -19,6 +19,14 @@
 
 #ifndef Print_h
 #define Print_h
+
+
+/* #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include "Printable.h" */
+
 #ifdef __cplusplus
 
 
@@ -40,6 +48,7 @@ extern "C" {
 #endif
 
 void test(void);
+
 #ifdef __cplusplus
 }
 
@@ -82,6 +91,7 @@ class Print
     size_t print(unsigned long, int = DEC);
     size_t print(double, int = 2);
     size_t print(const Printable&);
+    // size_t print(const String &s);
    
     size_t println(const char[]);
     size_t println(char);
@@ -98,7 +108,6 @@ class Print
 
     virtual void flush() { /* Empty implementation for backward compatibility */ }
 };
-
 
 extern Print Serial;
 

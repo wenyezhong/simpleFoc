@@ -36,7 +36,6 @@ class BLDCMotor: public FOCMotor
       * - 6PWM 
     */
     BLDCDriver* driver; 
-    
     /**  Motor hardware init function */
   	void init() override;
     /** Motor disable function */

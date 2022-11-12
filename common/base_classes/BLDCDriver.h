@@ -34,6 +34,8 @@ class BLDCDriver{
         */
         virtual void setPwm(float Ua, float Ub, float Uc) = 0;
 
+        // void setPwm(float Ua, float Ub, float Uc);
+
         /**
          * Set phase state, enable/disable
          *

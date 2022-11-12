@@ -35,7 +35,7 @@ void Sensor::init() {
     delayMicroseconds(1);
     vel_angle_prev = getSensorAngle(); // call again
     vel_angle_prev_ts = _micros();
-    delay(1);
+    _delay(1);
     getSensorAngle(); // call once
     delayMicroseconds(1);
     angle_prev = getSensorAngle(); // call again

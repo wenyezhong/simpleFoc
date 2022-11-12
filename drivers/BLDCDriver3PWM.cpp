@@ -2,7 +2,7 @@
 #include "drv8301.h"
 #include "gpio.h"
 #include "tim.h"
-
+#include <stdio.h>
 
 extern DRV8301_Obj gate_driver_;
 
@@ -86,6 +86,7 @@ void BLDCDriver3PWM::setPhaseState(int sa, int sb, int sc) {
 void BLDCDriver3PWM::setPwm(float Ua, float Ub, float Uc) {
 
   // limit the voltage in driver
+  printf("file:%s, line = %d\r\n",__FILE__,__LINE__);
   Ua = _constrain(Ua, 0.0f, voltage_limit);
   Ub = _constrain(Ub, 0.0f, voltage_limit);
   Uc = _constrain(Uc, 0.0f, voltage_limit);
@@ -94,7 +95,7 @@ void BLDCDriver3PWM::setPwm(float Ua, float Ub, float Uc) {
   dc_a = _constrain(Ua / voltage_power_supply, 0.0f , 1.0f );
   dc_b = _constrain(Ub / voltage_power_supply, 0.0f , 1.0f );
   dc_c = _constrain(Uc / voltage_power_supply, 0.0f , 1.0f );
-
+printf("file:%s, line = %d\r\n",__FILE__,__LINE__);
   // hardware specific writing
   // hardware specific function - depending on driver and mcu
   _writeDutyCycle3PWM(dc_a, dc_b, dc_c, params);

@@ -57,8 +57,8 @@ size_t Print::write(const uint8_t *buffer, size_t size)
 /* size_t Print::print(const String &s)
 {
   return write(s.c_str(), s.length());
-} */
-
+}
+ */
 size_t Print::print(const char str[])
 {
   return write(str);

@@ -336,9 +336,10 @@ void BLDCMotor::loopFOC() {
 void BLDCMotor::move(float new_target) {
 
   // downsampling (optional)
+  printf("file:%s, line = %d\r\n",__FILE__,__LINE__);
   if(motion_cnt++ < motion_downsample) return;
   motion_cnt = 0;
-
+printf("file:%s, line = %d\r\n",__FILE__,__LINE__);
   // shaft angle/velocity need the update() to be called first
   // get shaft angle
   // TODO sensor precision: the shaft_angle actually stores the complete position, including full rotations, as a float
@@ -352,6 +353,7 @@ void BLDCMotor::move(float new_target) {
 
   // if disabled do nothing
   if(!enabled) return;
+  printf("file:%s, line = %d\r\n",__FILE__,__LINE__);
   // set internal target variable
   if(_isset(new_target)) target = new_target;
   
@@ -406,6 +408,7 @@ void BLDCMotor::move(float new_target) {
     case MotionControlType::velocity_openloop:
       // velocity control in open loop - sensor precision: this calculation is numerically precise.
       shaft_velocity_sp = target;
+      printf("target = %f\r\n",target);
       voltage.q = velocityOpenloop(shaft_velocity_sp); // returns the voltage that is set to the motor
       voltage.d = 0;
       break;
@@ -433,7 +436,7 @@ void BLDCMotor::setPhaseVoltage(float Uq, float Ud, float angle_el) {
   float center;
   int sector;
   float _ca,_sa;
-
+  printf("foc_modulation = %d\r\n",foc_modulation);
   switch (foc_modulation)
   {
     case FOCModulationType::Trapezoid_120 :
@@ -517,7 +520,7 @@ void BLDCMotor::setPhaseVoltage(float Uq, float Ud, float angle_el) {
       Ua = Ualpha + center;
       Ub = -0.5f * Ualpha  + _SQRT3_2 * Ubeta + center;
       Uc = -0.5f * Ualpha - _SQRT3_2 * Ubeta + center;
-
+      printf("file:%s, line = %d\r\n",__FILE__,__LINE__);
       if (!modulation_centered) {
         float Umin = std::min(Ua, std::min(Ub, Uc));
         Ua -= Umin;
@@ -613,7 +616,7 @@ void BLDCMotor::setPhaseVoltage(float Uq, float Ud, float angle_el) {
       break;
 
   }
-
+printf("file:%s, line = %d\r\n",__FILE__,__LINE__);
   // set the voltages in driver
   driver->setPwm(Ua, Ub, Uc);
 }
@@ -625,9 +628,11 @@ void BLDCMotor::setPhaseVoltage(float Uq, float Ud, float angle_el) {
 // it uses voltage_limit variable
 float BLDCMotor::velocityOpenloop(float target_velocity){
   // get current timestamp
+  printf("file:%s, line = %d\r\n",__FILE__,__LINE__);
   unsigned long now_us = _micros();
   // calculate the sample time from last call
   float Ts = (now_us - open_loop_timestamp) * 1e-6f;
+  printf("file:%s, line = %d\r\n",__FILE__,__LINE__);
   // quick fix for strange cases (micros overflow + timestamp not defined)
   if(Ts <= 0 || Ts > 0.5f) Ts = 1e-3f;
 
@@ -635,7 +640,7 @@ float BLDCMotor::velocityOpenloop(float target_velocity){
   shaft_angle = _normalizeAngle(shaft_angle + target_velocity*Ts);
   // for display purposes
   shaft_velocity = target_velocity;
-
+printf("file:%s, line = %d\r\n",__FILE__,__LINE__);
   // use voltage limit or current limit
   float Uq = voltage_limit;
   if(_isset(phase_resistance)){
@@ -643,6 +648,7 @@ float BLDCMotor::velocityOpenloop(float target_velocity){
     // recalculate the current  
     current.q = (Uq - fabs(voltage_bemf))/phase_resistance;
   }
+  printf("file:%s, line = %d\r\n",__FILE__,__LINE__);
   // set the maximal allowed voltage (voltage_limit) with the necessary angle
   setPhaseVoltage(Uq,  0, _electricalAngle(shaft_angle, pole_pairs));
 

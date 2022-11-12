@@ -32,6 +32,8 @@ void MX_TIM1_Init(void)
 {
 
   /* USER CODE BEGIN TIM1_Init 0 */
+  /*定时器1 更新频率为48KHz,即为0到htim1.Init.Period，中心对齐方式，即下坡再下坡的频率就为24KHz
+  htim1.Init.RepetitionCounter =1  即两个update事件为一个周期，即为24KHz 那么ADC中断 TRGO频率为24KHz*/
 
   /* USER CODE END TIM1_Init 0 */
 
@@ -48,7 +50,7 @@ void MX_TIM1_Init(void)
   htim1.Init.CounterMode = TIM_COUNTERMODE_CENTERALIGNED3;
   htim1.Init.Period = TIM_1_8_PERIOD_CLOCKS;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim1.Init.RepetitionCounter = 0;//TIM_1_8_RCR;
+  htim1.Init.RepetitionCounter = TIM_1_8_RCR;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim1) != HAL_OK)
   {
@@ -100,13 +102,13 @@ void MX_TIM1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN TIM1_Init 2 */
-  __HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_1,1000);
+/*   __HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_1,1000);
   __HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_2,1000);
   __HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_3,1000);
 					
   HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_2);
-  HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_3);
+  HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_3); */
 
   /* USER CODE END TIM1_Init 2 */
   HAL_TIM_MspPostInit(&htim1);

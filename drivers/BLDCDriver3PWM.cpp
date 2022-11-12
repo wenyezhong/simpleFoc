@@ -1,6 +1,7 @@
 #include "BLDCDriver3PWM.h"
 #include "drv8301.h"
 #include "gpio.h"
+#include "tim.h"
 
 
 extern DRV8301_Obj gate_driver_;
@@ -31,6 +32,7 @@ void  BLDCDriver3PWM::enable(){
     if ( _isset(enableC_pin) ) digitalWrite(enableC_pin, enable_active_high); */
     // set zero to PWM
     HAL_GPIO_WritePin(gate_driver_.EngpioHandle, gate_driver_.EngpioNumber, GPIO_PIN_SET);
+    __HAL_TIM_MOE_ENABLE(&htim1);
     setPwm(0,0,0);
 }
 
@@ -40,6 +42,7 @@ void BLDCDriver3PWM::disable()
   // set zero to PWM
   setPwm(0, 0, 0);
   HAL_GPIO_WritePin(gate_driver_.EngpioHandle, gate_driver_.EngpioNumber, GPIO_PIN_RESET);
+  __HAL_TIM_MOE_DISABLE_UNCONDITIONALLY(&htim1);
   // disable the driver - if enable_pin pin available
   /* if ( _isset(enableA_pin) ) digitalWrite(enableA_pin, !enable_active_high);
   if ( _isset(enableB_pin) ) digitalWrite(enableB_pin, !enable_active_high);

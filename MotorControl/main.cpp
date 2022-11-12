@@ -120,72 +120,58 @@ void DRV8301_setup() {
 
 
 BLDCMotor motor = BLDCMotor(7);
-void doMotion(char* cmd){ command.motion(&motor, cmd); }
-
+// void doMotion(char* cmd){ command.motion(&motor, cmd); }
+//target variable
+float target_velocity = 0;
+// instantiate the commander
+// Commander command = Commander(Serial);
+void doTarget(char* cmd) { command.scalar(&target_velocity, cmd); }
+void doLimit(char* cmd) { command.scalar(&motor.voltage_limit, cmd); }
 
 int simpleFOCDrive_main(void)
 {
-    // command = *(new Commander(Serial));
+    
     DRV8301_setup();   
     BLDCDriver3PWM driver = BLDCDriver3PWM(5, 10, 6, 8);
 
-    
-
     driver.voltage_power_supply = 24;
+  // limit the maximal dc voltage the driver can set
+  // as a protection measure for the low-resistance motors
+  // this value is fixed on startup
+    driver.voltage_limit = 12;
     driver.init();
-    // link driver
+    // link the motor and the driver
     motor.linkDriver(&driver);
 
+  // limiting motor movements
+  // limit the voltage to be set to the motor
+  // start very low for high resistance motors
+  // currnet = resistance*voltage, so try to be well under 1Amp
+    motor.voltage_limit = 12;   // [V]
+
+    // open loop control config
     motor.controller = MotionControlType::velocity_openloop;
 
-    // contoller configuration based on the controll type
-    motor.PID_velocity.P = 0.05f;
-    motor.PID_velocity.I = 1;
-    motor.PID_velocity.D = 0;
-    // default voltage_power_supply
-    motor.voltage_limit = 24;
-
-    // velocity low pass filtering time constant
-    motor.LPF_velocity.Tf = 0.01f;
-
-    // angle loop controller
-    motor.P_angle.P = 20;
-    // angle loop velocity limit
-    motor.velocity_limit = 20;
-
     motor.useMonitoring(Serial);
-    motor.monitor_downsample = 0; // disable intially
-    motor.monitor_variables = _MON_TARGET | _MON_VEL | _MON_ANGLE; // monitor target velocity and angle
-
-    // initialise motor
+    // init motor hardware
     motor.init();
-    // align encoder and start FOC
-    motor.initFOC();
 
-    // set the inital target value
-    motor.target = 1;
+    // add target command T
+    command.add('T', doTarget, "target velocity");
+    command.add('L', doLimit, "voltage limit");
 
-    // subscribe motor to the commander
-    command.add('T', doMotion, "motion control");
-    // command.add('M', doMotor, "motor");
-
-    // Run user commands to configure and the motor (find the full command list in docs.simplefoc.com)
-    Serial.println("Motor ready.");
-
-  _delay(1000);
+    // Serial.begin(115200);
+    Serial.println("Motor ready!");
+    Serial.println("Set target velocity [rad/s]");
+    _delay(1000);
 
     return 0;
 }
 
 void  motorTask()
 {
-  // iterative setting FOC phase voltage
-  motor.loopFOC();
-  // iterative function setting the outter loop target
-  motor.move();
-  // motor monitoring
-  motor.monitor();
-  // user communication
-  command.run();
+    motor.move(target_velocity);
+    // user communication
+    command.run();
 }
 }

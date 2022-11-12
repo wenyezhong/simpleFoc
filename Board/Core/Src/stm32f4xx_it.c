@@ -248,7 +248,7 @@ void UART4_IRQHandler(void)
   if ((isrflags & USART_SR_RXNE) != RESET)
   {
     recDat = (uint8_t)(huart4.Instance->DR & (uint8_t)0x00FF);
-    // recvTask(recDat);
+    recvTask(recDat);
   }
 
   /* USER CODE END UART4_IRQn 1 */

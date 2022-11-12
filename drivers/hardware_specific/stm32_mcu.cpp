@@ -5,19 +5,20 @@
 #include "adc.h"
 
 /* Function implementations --------------------------------------------------*/
-void start_pwm(TIM_HandleTypeDef* htim) {
+void start_pwm(TIM_HandleTypeDef* htim)
+{
     // Init PWM
-    /* int half_load = TIM_1_8_PERIOD_CLOCKS / 2;
-    htim->Instance->CCR1 = half_load;
-    htim->Instance->CCR2 = half_load;
-    htim->Instance->CCR3 = half_load;
+  int half_load = TIM_1_8_PERIOD_CLOCKS / 2;
+  htim->Instance->CCR1 = half_load;
+  htim->Instance->CCR2 = half_load;
+  htim->Instance->CCR3 = half_load;
 
-    // This hardware obfustication layer really is getting on my nerves
-    HAL_TIM_PWM_Start(htim, TIM_CHANNEL_1);
-    // HAL_TIMEx_PWMN_Start(htim, TIM_CHANNEL_1);
-    HAL_TIM_PWM_Start(htim, TIM_CHANNEL_2);
-    // HAL_TIMEx_PWMN_Start(htim, TIM_CHANNEL_2);
-    HAL_TIM_PWM_Start(htim, TIM_CHANNEL_3); */
+  // This hardware obfustication layer really is getting on my nerves
+  HAL_TIM_PWM_Start(htim, TIM_CHANNEL_1);
+  // HAL_TIMEx_PWMN_Start(htim, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(htim, TIM_CHANNEL_2);
+  // HAL_TIMEx_PWMN_Start(htim, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(htim, TIM_CHANNEL_3);
     // HAL_TIMEx_PWMN_Start(htim, TIM_CHANNEL_3);
 
     // htim->Instance->CCR4 = 1;
@@ -26,23 +27,23 @@ void start_pwm(TIM_HandleTypeDef* htim) {
 
 void start_adc_pwm() {
     // Enable ADC and interrupts
-    // __HAL_ADC_ENABLE(&hadc1);
+    __HAL_ADC_ENABLE(&hadc1);
     __HAL_ADC_ENABLE(&hadc2);
-    // __HAL_ADC_ENABLE(&hadc3);
+    __HAL_ADC_ENABLE(&hadc3);
     // Warp field stabilize.
     _delay(2);
-    // __HAL_ADC_ENABLE_IT(&hadc1, ADC_IT_JEOC);
+    __HAL_ADC_ENABLE_IT(&hadc1, ADC_IT_JEOC);
     __HAL_ADC_ENABLE_IT(&hadc2, ADC_IT_JEOC);
-    // __HAL_ADC_ENABLE_IT(&hadc3, ADC_IT_JEOC);
-    // __HAL_ADC_ENABLE_IT(&hadc2, ADC_IT_EOC);
-    // __HAL_ADC_ENABLE_IT(&hadc3, ADC_IT_EOC);
+    __HAL_ADC_ENABLE_IT(&hadc3, ADC_IT_JEOC);
+    __HAL_ADC_ENABLE_IT(&hadc2, ADC_IT_EOC);
+    __HAL_ADC_ENABLE_IT(&hadc3, ADC_IT_EOC);
 
     // Ensure that debug halting of the core doesn't leave the motor PWM running
-    // __HAL_DBGMCU_FREEZE_TIM1();
+    __HAL_DBGMCU_FREEZE_TIM1();
     // __HAL_DBGMCU_FREEZE_TIM8();
     // __HAL_DBGMCU_FREEZE_TIM13();
 
-    // start_pwm(&htim1);
+    start_pwm(&htim1);
     // start_pwm(&htim8);
     // TODO: explain why this offset
     // sync_timers(&htim1, &htim8, TIM_CLOCKSOURCE_ITR0, TIM_1_8_PERIOD_CLOCKS / 2 - 1 * 128,&htim13);

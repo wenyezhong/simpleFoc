@@ -51,7 +51,7 @@ void MX_UART4_Init(void)
   }
   /* USER CODE BEGIN UART4_Init 2 */
   // UART_Receive_IT(&huart4);
-  __HAL_UART_ENABLE_IT(&huart4, UART_IT_RXNE);
+  // __HAL_UART_ENABLE_IT(&huart4, UART_IT_RXNE);
   /* USER CODE END UART4_Init 2 */
 
 }

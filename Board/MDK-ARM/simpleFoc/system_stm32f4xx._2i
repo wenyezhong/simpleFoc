@@ -1,6 +1,0 @@
---c99 -c --cpu Cortex-M4.fp.sp -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include
--I.\RTE\_simpleFoc
--IC:\Users\Administrator\AppData\Local\Arm\Packs\ARM\CMSIS\5.6.0\CMSIS\Core\Include
--IC:\Users\Administrator\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.15.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include
--D__UVISION_VERSION="529" -D_RTE_ -DSTM32F405xx -DUSE_HAL_DRIVER -DSTM32F405xx
--o simplefoc\system_stm32f4xx.o --omf_browse simplefoc\system_stm32f4xx.crf --depend simplefoc\system_stm32f4xx.d --feedback "simpleFoc\simpleFoc.fed" "../Core/Src/system_stm32f4xx.c"

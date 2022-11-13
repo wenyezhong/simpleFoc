@@ -79,7 +79,7 @@ void _writeDutyCycle3PWM(float dc_a,  float dc_b, float dc_c, void* params){
   __HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_1,(uint16_t)3500*dc_a);
   __HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_2,(uint16_t)3500*dc_b);
   __HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_3,(uint16_t)3500*dc_c);
-  printf("file:%s, line = %d\r\n",__FILE__,__LINE__);
+  // printf("file:%s, line = %d\r\n",__FILE__,__LINE__);
   // _setPwm(((STM32DriverParams*)params)->timers[0], ((STM32DriverParams*)params)->channels[0], _PWM_RANGE*dc_a, _PWM_RESOLUTION);
   // _setPwm(((STM32DriverParams*)params)->timers[1], ((STM32DriverParams*)params)->channels[1], _PWM_RANGE*dc_b, _PWM_RESOLUTION);
   // _setPwm(((STM32DriverParams*)params)->timers[2], ((STM32DriverParams*)params)->channels[2], _PWM_RANGE*dc_c, _PWM_RESOLUTION);

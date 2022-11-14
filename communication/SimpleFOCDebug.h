@@ -47,8 +47,6 @@ void testSimpleFOCDebug(void);
 #ifdef __cplusplus
 } */
 
-
-
 class SimpleFOCDebug {
 public:
     static void enable(Print* debugPrint = &Serial); 

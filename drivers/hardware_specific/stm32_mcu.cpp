@@ -3,6 +3,113 @@
 #include "stm32_mcu.h"
 #include "tim.h"
 #include "adc.h"
+// #include <stdbool.h>
+
+
+
+uint32_t phB_ADCValue,phC_ADCValue;
+
+uint16_t adc_measurements_[ADC_CHANNEL_COUNT] = { 0 };
+constexpr float adc_full_scale = static_cast<float>(1UL << 12UL);
+constexpr float adc_ref_voltage = 3.3f;
+float vbus_voltage = 12.0f;
+
+
+extern float phase_current_rev_gain_;
+extern float shunt_conductance;
+
+
+extern "C" {
+
+void vbus_sense_adc_cb(ADC_HandleTypeDef* hadc, bool injected) {
+    constexpr float voltage_scale = adc_ref_voltage * VBUS_S_DIVIDER_RATIO / adc_full_scale;
+    // Only one conversion in sequence, so only rank1
+    uint32_t ADCValue = HAL_ADCEx_InjectedGetValue(hadc, ADC_INJECTED_RANK_1);
+    vbus_voltage = ADCValue * voltage_scale;
+    // printf("vbus_voltage=%f\r\n",vbus_voltage);
+}
+// This is the callback from the ADC that we expect after the PWM has triggered an ADC conversion.
+// Timing diagram: Firmware/timing_diagram_v3.png
+void pwm_trig_adc_cb(ADC_HandleTypeDef* hadc, bool injected) {
+#define calib_tau 0.2f  //@TOTO make more easily configurable
+    constexpr float calib_filter_k = CURRENT_MEAS_PERIOD / calib_tau;
+
+    // Ensure ADCs are expected ones to simplify the logic below
+    if (!(hadc == &hadc2 || hadc == &hadc3)) {
+        // low_level_fault(Motor::ERROR_ADC_FAILED);
+        return;
+    };    
+
+
+    uint32_t ADCValue;
+    if (injected) {
+        ADCValue = HAL_ADCEx_InjectedGetValue(hadc, ADC_INJECTED_RANK_1);
+    } 
+    else
+    {
+        ADCValue = HAL_ADC_GetValue(hadc);
+    }
+    // float current = axis.motor_.phase_current_from_adcval(ADCValue);
+    // printf("ADCValue=%.4x\r\n",ADCValue);
+    /* int adcval_bal = (int)ADCValue - (1 << 11);
+    float amp_out_volt = (3.3f / (float)(1 << 12)) * (float)adcval_bal;
+    float shunt_volt = amp_out_volt * phase_current_rev_gain_;
+    float current = shunt_volt * shunt_conductance; */
+    // printf("current=%f\r\n",current);
+    //return current;
+    if(hadc == &hadc2)
+    {
+      phB_ADCValue= ADCValue;
+    } 
+    else
+    {
+      phC_ADCValue= ADCValue;
+    }
+}
+}
+
+// @brief Given an adc channel return the measured voltage.
+// returns NaN if the channel is not valid.
+float get_adc_voltage_channel(uint16_t channel)
+{
+    if (channel < ADC_CHANNEL_COUNT)
+        return ((float)adc_measurements_[channel]) * (adc_ref_voltage / adc_full_scale);
+    else
+        return 0.0f / 0.0f; // NaN
+}
+
+void start_general_purpose_adc() {
+    ADC_ChannelConfTypeDef sConfig;
+
+    // Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
+    hadc1.Instance = ADC1;
+    hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+    hadc1.Init.Resolution = ADC_RESOLUTION_12B;
+    hadc1.Init.ScanConvMode = ENABLE;
+    hadc1.Init.ContinuousConvMode = ENABLE;
+    hadc1.Init.DiscontinuousConvMode = DISABLE;
+    hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+    hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+    hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+    hadc1.Init.NbrOfConversion = ADC_CHANNEL_COUNT;
+    hadc1.Init.DMAContinuousRequests = ENABLE;
+    hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+    if (HAL_ADC_Init(&hadc1) != HAL_OK)
+    {
+        Error_Handler();
+    }
+
+    // Set up sampling sequence (channel 0 ... channel 15)
+    sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;
+    for (uint32_t channel = 0; channel < ADC_CHANNEL_COUNT; ++channel) {
+        sConfig.Channel = channel << ADC_CR1_AWDCH_Pos;
+        sConfig.Rank = channel + 1; // rank numbering starts at 1
+        if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+            Error_Handler();
+    }
+
+    HAL_ADC_Start_DMA(&hadc1, reinterpret_cast<uint32_t*>(adc_measurements_), ADC_CHANNEL_COUNT);
+}
 
 /* Function implementations --------------------------------------------------*/
 void start_pwm(TIM_HandleTypeDef* htim)

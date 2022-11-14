@@ -122,8 +122,9 @@ void DRV8301_setup() {
 BLDCMotor motor = BLDCMotor(7);
 BLDCDriver3PWM driver = BLDCDriver3PWM(5, 10, 6, 8);
 // void doMotion(char* cmd){ command.motion(&motor, cmd); }
+InlineCurrentSense current_sense = InlineCurrentSense(SHUNT_RESISTANCE, 1.0f/phase_current_rev_gain_,NOT_SET, 0, 0);
 //target variable
-float target_velocity = 5;
+float target_velocity = 0;
 // instantiate the commander
 // Commander command = Commander(Serial);
 void doTarget(char* cmd) { command.scalar(&target_velocity, cmd); }
@@ -142,6 +143,8 @@ int simpleFOCDrive_main(void)
     driver.init();
     // link the motor and the driver
     motor.linkDriver(&driver);
+
+    current_sense.init();
 
   // limiting motor movements
   // limit the voltage to be set to the motor
@@ -175,4 +178,6 @@ void  motorTask()
     // user communication
     // command.run();
 }
+
 }
+

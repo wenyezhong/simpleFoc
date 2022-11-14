@@ -22,6 +22,8 @@
 #include "stm32f4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdbool.h>
+// #include "stm32_mcu.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -52,6 +54,27 @@
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+extern void vbus_sense_adc_cb(ADC_HandleTypeDef* hadc, bool injected);
+extern void pwm_trig_adc_cb(ADC_HandleTypeDef* hadc, bool injected);
+typedef void (*ADC_handler_t)(ADC_HandleTypeDef* hadc, bool injected);
+void ADC_IRQ_Dispatch(ADC_HandleTypeDef* hadc, ADC_handler_t callback) {
+
+  // Injected measurements
+  uint32_t JEOC = __HAL_ADC_GET_FLAG(hadc, ADC_FLAG_JEOC);
+  uint32_t JEOC_IT_EN = __HAL_ADC_GET_IT_SOURCE(hadc, ADC_IT_JEOC);
+  if (JEOC && JEOC_IT_EN) {
+    callback(hadc, true);
+    __HAL_ADC_CLEAR_FLAG(hadc, (ADC_FLAG_JSTRT | ADC_FLAG_JEOC));
+  }
+  // Regular measurements
+  uint32_t EOC = __HAL_ADC_GET_FLAG(hadc, ADC_FLAG_EOC);
+  uint32_t EOC_IT_EN = __HAL_ADC_GET_IT_SOURCE(hadc, ADC_IT_EOC);
+  if (EOC && EOC_IT_EN) {
+    callback(hadc, false);
+    // HAL_GPIO_TogglePin(GPIOA,GPIO_7_Pin);  //测试发生频率
+    __HAL_ADC_CLEAR_FLAG(hadc, (ADC_FLAG_STRT | ADC_FLAG_EOC));
+  }
+}
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
@@ -210,6 +233,12 @@ void ADC_IRQHandler(void)
 {
   /* USER CODE BEGIN ADC_IRQn 0 */
   HAL_GPIO_TogglePin(GPIO7_GPIO_Port, GPIO7_Pin);
+  ADC_IRQ_Dispatch(&hadc1, &vbus_sense_adc_cb);
+  ADC_IRQ_Dispatch(&hadc2, &pwm_trig_adc_cb);
+  // ADC_IRQ_Dispatch(&hadc3, &pwm_trig_adc_cb);
+  // Bypass HAL
+  // return;
+
   /* USER CODE END ADC_IRQn 0 */
   HAL_ADC_IRQHandler(&hadc1);
   HAL_ADC_IRQHandler(&hadc2);

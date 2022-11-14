@@ -32,8 +32,8 @@ void MX_TIM1_Init(void)
 {
 
   /* USER CODE BEGIN TIM1_Init 0 */
-  /*定时器1 更新频率为48KHz,即为0到htim1.Init.Period，中心对齐方式，即下坡再下坡的频率就为24KHz
-  htim1.Init.RepetitionCounter =1  即两个update事件为一个周期，即为24KHz 那么ADC中断 TRGO频率为24KHz*/
+  /*定时�?1 更新频率�?48KHz,即为0到htim1.Init.Period，中心对齐方式，即下坡再下坡的频率就�?24KHz
+  htim1.Init.RepetitionCounter =1  即两个update事件为一个周期，即为24KHz 那么ADC中断 TRGO频率�?24KHz*/
 
   /* USER CODE END TIM1_Init 0 */
 
@@ -130,7 +130,7 @@ void MX_TIM6_Init(void)
   htim6.Instance = TIM6;
   htim6.Init.Prescaler = 83;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim6.Init.Period = 5000;
+  htim6.Init.Period = 50000;
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
   {

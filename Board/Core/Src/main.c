@@ -60,17 +60,7 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-/* int fputc(int ch, FILE *f)
-{
-	HAL_UART_Transmit(&huart4, (uint8_t *)&ch, 1, 0xffff);
-	return ch;
-}
-int fgetc(FILE *f)
-{
-	uint8_t ch = 0;
-	HAL_UART_Receive(&huart4, &ch, 1, 0xffff);
-	return ch;
-} */
+
 int _write(int fd, char *ch, int len)
 {
  HAL_UART_Transmit(&huart4, (uint8_t*)ch, len, 0xFFFF);

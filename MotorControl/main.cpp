@@ -123,7 +123,7 @@ BLDCMotor motor = BLDCMotor(7);
 BLDCDriver3PWM driver = BLDCDriver3PWM(5, 10, 6, 8);
 // void doMotion(char* cmd){ command.motion(&motor, cmd); }
 //target variable
-float target_velocity = 0;
+float target_velocity = 5;
 // instantiate the commander
 // Commander command = Commander(Serial);
 void doTarget(char* cmd) { command.scalar(&target_velocity, cmd); }
@@ -132,14 +132,13 @@ void doLimit(char* cmd) { command.scalar(&motor.voltage_limit, cmd); }
 int simpleFOCDrive_main(void)
 {
     
-    DRV8301_setup();   
-    
+    DRV8301_setup();      
 
     driver.voltage_power_supply = 24;
   // limit the maximal dc voltage the driver can set
   // as a protection measure for the low-resistance motors
   // this value is fixed on startup
-    driver.voltage_limit = 6;
+    driver.voltage_limit = 12;
     driver.init();
     // link the motor and the driver
     motor.linkDriver(&driver);
@@ -148,7 +147,7 @@ int simpleFOCDrive_main(void)
   // limit the voltage to be set to the motor
   // start very low for high resistance motors
   // currnet = resistance*voltage, so try to be well under 1Amp
-    motor.voltage_limit = 3;   // [V]   
+    motor.voltage_limit = 12;   // [V]   
     // open loop control config
     motor.controller = MotionControlType::velocity_openloop;
 
@@ -174,6 +173,6 @@ void  motorTask()
 {
     motor.move(target_velocity);
     // user communication
-    command.run();
+    // command.run();
 }
 }

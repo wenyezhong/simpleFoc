@@ -69,7 +69,7 @@ class Commander
      * @param reader - temporary stream to read user input
      * @param eol - temporary end of line sentinel
      */
-    // void run(Print &reader, char eol = '\n');
+    void run(Print &reader, char eol = '\n');
     /**
      * Function reading the string of user input and firing callbacks that have been added to the commander
      * once the user has requested them - when he sends the command

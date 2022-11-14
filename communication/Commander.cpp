@@ -1,6 +1,7 @@
 #include "Commander.h"
 #include <stdlib.h>
 #include <ctype.h>
+#include <usart.h>
 
 // Commander command = Commander(Serial);
 Commander *pCommander;
@@ -47,24 +48,46 @@ void Commander::add(char id, CommandCallback onCommand, char* label ){
   call_count++;
 }
 
+int readSerial(char *pr)
+{
+  uint8_t ch;
+  HAL_StatusTypeDef huartSta = HAL_OK;
+  uint32_t isrflags   = READ_REG(huart4.Instance->SR);
+  if ((isrflags & USART_SR_RXNE) != RESET)
+  {
+      huartSta = HAL_UART_Receive(&huart4,(uint8_t *)pr, 1, 5);
+      if(huartSta!=HAL_OK)
+        return -1;
+      else
+      {        
+        return 0;
+      }
+  
+  }
+  return -1;
+}
 
 void Commander::run(){
   if(!com_port) return;
-  // run(*com_port, eol);
+  run(*com_port, eol);
 }
 
-/* void Commander::run(Print& serial, char eol){
+void Commander::run(Print& serial, char eol){
   Print* tmp = com_port; // save the serial instance
   char eol_tmp = this->eol;
   this->eol = eol;
-  com_port = &serial;
-
+  com_port = &serial;  
+  char ch;
+  int ret;
   // a string to hold incoming data
   // while (serial.available()) {
-  while (1) {
+  while (1)
+  {
     // get the new byte:
-    int ch ;//= serial.read();
-    received_chars[rec_cnt++] = (char)ch;
+    ret = readSerial(&ch);//serial.read();
+    if(ret)
+      break;
+    received_chars[rec_cnt++] = (char)ch;    
     // end of user input
     if(echo)
       print((char)ch);
@@ -72,10 +95,12 @@ void Commander::run(){
       // execute the user command
       run(received_chars);
       // reset the command buffer
+      memset(received_chars,0x0,rec_cnt);
       received_chars[0] = 0;
       rec_cnt=0;
     }
     if (rec_cnt>=MAX_COMMAND_LENGTH) { // prevent buffer overrun if message is too long
+        memset(received_chars,0x0,MAX_COMMAND_LENGTH);
         received_chars[0] = 0;
         rec_cnt=0;
     }
@@ -83,7 +108,7 @@ void Commander::run(){
 
   com_port = tmp; // reset the instance to the internal value
   this->eol = eol_tmp;
-}*/
+}
 
 void Commander::run(char* user_input){
   // execute the user command

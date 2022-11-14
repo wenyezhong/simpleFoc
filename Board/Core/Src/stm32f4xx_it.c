@@ -61,7 +61,6 @@ extern ADC_HandleTypeDef hadc1;
 extern ADC_HandleTypeDef hadc2;
 extern ADC_HandleTypeDef hadc3;
 extern TIM_HandleTypeDef htim1;
-extern UART_HandleTypeDef huart4;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -232,26 +231,6 @@ void TIM1_UP_TIM10_IRQHandler(void)
   /* USER CODE BEGIN TIM1_UP_TIM10_IRQn 1 */
 
   /* USER CODE END TIM1_UP_TIM10_IRQn 1 */
-}
-
-/**
-  * @brief This function handles UART4 global interrupt.
-  */
-void UART4_IRQHandler(void)
-{
-  /* USER CODE BEGIN UART4_IRQn 0 */
-  uint8_t recDat;
-  /* USER CODE END UART4_IRQn 0 */
-  // HAL_UART_IRQHandler(&huart4);
-  /* USER CODE BEGIN UART4_IRQn 1 */
-  uint32_t isrflags   = READ_REG(huart4.Instance->SR);
-  if ((isrflags & USART_SR_RXNE) != RESET)
-  {
-    recDat = (uint8_t)(huart4.Instance->DR & (uint8_t)0x00FF);
-    recvTask(recDat);
-  }
-
-  /* USER CODE END UART4_IRQn 1 */
 }
 
 /**

@@ -114,53 +114,41 @@ void DRV8301_setup() {
 }
 
 
-// 无刷直流电机及驱动器实例
-// BLDCMotor motor = BLDCMotor(pole pair number极对数, phase resistance相电阻（可选的）);
-BLDCMotor motor = BLDCMotor(7);
-// BLDCDriver3PWM driver = BLDCDriver3PWM(pwmA, pwmB, pwmC, 使能引脚（可选的）);
-BLDCDriver3PWM driver = BLDCDriver3PWM(9, 5, 6, 8);
-// commander实例化
-Commander command = Commander(Serial);
-void doTarget(char* cmd) { command.scalar(&motor.target, cmd); }
-float target_velocity = 2;
+
+Encoder encoder = Encoder(1,2,4096,3);
+// interrupt routine intialisation
+void doA(){encoder.handleA();}
+void doB(){encoder.handleB();}
+void doIndex(){encoder.handleIndex();}
+
 void setup() {
+  // monitoring port
+//   Serial.begin(115200);
 
+  // enable/disable quadrature mode
+  encoder.quadrature = Quadrature::ON;
 
-    DRV8301_setup();
+  // check if you need internal pullups
+  encoder.pullup = Pullup::USE_EXTERN;
+  
+  // initialise encoder hardware
+  encoder.init();
+  // hardware interrupt enable
+  encoder.enableInterrupts(doA, doB,doIndex);
 
-  // 配置驱动器
-  // 电源电压 [V]
-  driver.voltage_power_supply = 24;
-  driver.init();
-  // 连接电机和驱动器
-  motor.linkDriver(&driver);
-
-  // 限制电机运动
-  // motor.phase_resistance = 3.52 // [Ohm]
-  // motor.current_limit = 2;   // [Amps] - 如果相电阻有被定义
-  motor.voltage_limit = 12;   // [V] - 如果相电阻没有定义
-  motor.velocity_limit = 20; // [rad/s] cca 50rpm
- 
-  // 配置开环控制
-  motor.controller = MotionControlType::velocity_openloop;
-
-  // 初始化电机
-  motor.init();
-
-  // 添加目标命令T
-  command.add('T', doTarget, "target velocity");
-
-  Serial.println("Motor ready!");
-  Serial.println("Set target velocity [rad/s]");
+  Serial.println("Encoder ready");
   _delay(1000);
 }
-void loop() {
 
-  // 开环速度运动
-  // 使用电机电压限制和电机速度限制
-  motor.move(target_velocity);
-  // 用户通信
-  command.run();
+void loop() {
+  // iterative function updating the sensor internal variables
+  // it is usually called in motor.loopFOC()
+  // not doing much for the encoder though
+  encoder.update();
+  // display the angle and the angular velocity to the terminal
+  Serial.print(encoder.getAngle());
+  Serial.print("\t");
+  Serial.println(encoder.getVelocity());
 }
 
 }

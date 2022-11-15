@@ -115,10 +115,11 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   // test();
   // testSimpleFOCDebug();
-  simpleFOCDrive_main();
+  
+  setup();
   while (1)
   {
-    motorTask();
+    loop();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

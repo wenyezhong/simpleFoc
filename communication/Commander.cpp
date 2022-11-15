@@ -52,7 +52,7 @@ int readSerial(char *pr)
 {
   uint8_t ch;
   HAL_StatusTypeDef huartSta = HAL_OK;
-  uint32_t isrflags   = READ_REG(huart4.Instance->SR);
+  uint32_t isrflags  = READ_REG(huart4.Instance->SR);
   if ((isrflags & USART_SR_RXNE) != RESET)
   {
       huartSta = HAL_UART_Receive(&huart4,(uint8_t *)pr, 1, 5);
@@ -95,12 +95,12 @@ void Commander::run(Print& serial, char eol){
       // execute the user command
       run(received_chars);
       // reset the command buffer
-      memset(received_chars,0x0,rec_cnt);
+      // memset(received_chars,0x0,rec_cnt);
       received_chars[0] = 0;
       rec_cnt=0;
     }
     if (rec_cnt>=MAX_COMMAND_LENGTH) { // prevent buffer overrun if message is too long
-        memset(received_chars,0x0,MAX_COMMAND_LENGTH);
+        // memset(received_chars,0x0,MAX_COMMAND_LENGTH);
         received_chars[0] = 0;
         rec_cnt=0;
     }

@@ -114,53 +114,30 @@ void DRV8301_setup() {
 }
 
 
-// 无刷直流电机及驱动器实例
-// BLDCMotor motor = BLDCMotor(pole pair number极对数, phase resistance相电阻（可选的）);
-BLDCMotor motor = BLDCMotor(7);
-// BLDCDriver3PWM driver = BLDCDriver3PWM(pwmA, pwmB, pwmC, 使能引脚（可选的）);
+
 BLDCDriver3PWM driver = BLDCDriver3PWM(9, 5, 6, 8);
-// commander实例化
-Commander command = Commander(Serial);
-void doTarget(char* cmd) { command.scalar(&motor.target, cmd); }
-float target_velocity = 2;
+
 void setup() {
-
-
-    DRV8301_setup();
-
-  // 配置驱动器
+    
+    DRV8301_setup(); 
+  // PWM 频率 [Hz]
+  driver.pwm_frequency = 50000;
   // 电源电压 [V]
   driver.voltage_power_supply = 24;
+  // 允许最大直流电压 - 默认为电源电压
+  driver.voltage_limit = 24;
+
+  // 初始化驱动器
   driver.init();
-  // 连接电机和驱动器
-  motor.linkDriver(&driver);
 
-  // 限制电机运动
-  // motor.phase_resistance = 3.52 // [Ohm]
-  // motor.current_limit = 2;   // [Amps] - 如果相电阻有被定义
-  motor.voltage_limit = 12;   // [V] - 如果相电阻没有定义
-  motor.velocity_limit = 20; // [rad/s] cca 50rpm
- 
-  // 配置开环控制
-  motor.controller = MotionControlType::velocity_openloop;
+  // 启用驱动器
+  driver.enable();
 
-  // 初始化电机
-  motor.init();
-
-  // 添加目标命令T
-  command.add('T', doTarget, "target velocity");
-
-  Serial.println("Motor ready!");
-  Serial.println("Set target velocity [rad/s]");
   _delay(1000);
 }
+
 void loop() {
-
-  // 开环速度运动
-  // 使用电机电压限制和电机速度限制
-  motor.move(target_velocity);
-  // 用户通信
-  command.run();
+    // 设置PWM (A: 3V, B: 1V, C: 5V)
+    driver.setPwm(3,1,5);
 }
-
 }

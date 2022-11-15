@@ -7,7 +7,7 @@
 
 
 
-float phB_ADCValue,phC_ADCValue;
+volatile float phB_ADCValue,phC_ADCValue;
 
 uint16_t adc_measurements_[ADC_CHANNEL_COUNT] = { 0 };
 constexpr float adc_full_scale = static_cast<float>(1UL << 12UL);
@@ -60,11 +60,11 @@ void pwm_trig_adc_cb(ADC_HandleTypeDef* hadc, bool injected) {
     //return current;
     if(hadc == &hadc2)
     {
-      phB_ADCValue= amp_out_volt;
+      phB_ADCValue = amp_out_volt;
     } 
     else
     {
-      phC_ADCValue= amp_out_volt;
+      phC_ADCValue = amp_out_volt;
     }
 }
 }
@@ -158,7 +158,7 @@ void start_adc_pwm() {
     // htim_a->Instance->BDTR &= ~(TIM_BDTR_MOE);
     // htim_a->Instance->BDTR |= (TIM_BDTR_MOE);
     // Motor output starts in the disabled state
-    // __HAL_TIM_MOE_DISABLE_UNCONDITIONALLY(&htim1);
+    __HAL_TIM_MOE_DISABLE_UNCONDITIONALLY(&htim1);
     // __HAL_TIM_MOE_DISABLE_UNCONDITIONALLY(&htim8);
 
     // Enable the update interrupt (used to coherently sample GPIO)
@@ -184,9 +184,9 @@ void* _configure3PWM(long pwm_frequency,const int pinA, const int pinB, const in
 void _writeDutyCycle3PWM(float dc_a,  float dc_b, float dc_c, void* params){
   // transform duty cycle from [0,1] to [0,3500]
 
-  __HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_1,(uint16_t)3500*dc_a);
-  __HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_2,(uint16_t)3500*dc_b);
-  __HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_3,(uint16_t)3500*dc_c);
+  __HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_1,(uint16_t)3499*dc_a);
+  __HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_2,(uint16_t)3499*dc_b);
+  __HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_3,(uint16_t)3499*dc_c);
   // printf("file:%s, line = %d\r\n",__FILE__,__LINE__);
   // _setPwm(((STM32DriverParams*)params)->timers[0], ((STM32DriverParams*)params)->channels[0], _PWM_RANGE*dc_a, _PWM_RESOLUTION);
   // _setPwm(((STM32DriverParams*)params)->timers[1], ((STM32DriverParams*)params)->channels[1], _PWM_RANGE*dc_b, _PWM_RESOLUTION);

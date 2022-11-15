@@ -49,12 +49,11 @@ void InlineCurrentSense::calibrateOffsets(){
     for (int i = 0; i < calibration_rounds; i++) {
         offset_ia += 0;
         offset_ib += phB_ADCValue;
-        offset_ic += phC_ADCValue;
-        // offset_ic += phC_ADCValue;
+        offset_ic += phC_ADCValue;        
         _delay(1);
     }
     // calculate the mean offsets
-    offset_ia = offset_ia / calibration_rounds;   
+    offset_ia = offset_ia / calibration_rounds;
     offset_ib = offset_ib / calibration_rounds;
     offset_ic = offset_ic / calibration_rounds;
 }
@@ -62,7 +61,8 @@ void InlineCurrentSense::calibrateOffsets(){
 // read all three phase currents (if possible 2 or 3)
 PhaseCurrent_s InlineCurrentSense::getPhaseCurrents(){
     PhaseCurrent_s current;
-    current.a = (!_isset(pinA)) ? 0 : (phB_ADCValue - offset_ia)*gain_a;;// amps
+    current.a = 0;
+    // current.a = (!_isset(pinA)) ? 0 : (phB_ADCValue - offset_ia)*gain_a;// amps
     current.b = (!_isset(pinB)) ? 0 : (phB_ADCValue - offset_ib)*gain_b;// amps
     current.c = (!_isset(pinC)) ? 0 : (phC_ADCValue - offset_ic)*gain_c; // amps
     return current;

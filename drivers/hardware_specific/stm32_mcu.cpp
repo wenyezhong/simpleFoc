@@ -52,7 +52,7 @@ void pwm_trig_adc_cb(ADC_HandleTypeDef* hadc, bool injected) {
     // float current = axis.motor_.phase_current_from_adcval(ADCValue);
     // printf("ADCValue=%.4x\r\n",ADCValue);
     // int adcval_bal = (int)ADCValue - (1 << 11);
-    int adcval_bal = (int)ADCValue;
+    int adcval_bal = ADCValue;
     float amp_out_volt = (3.3f / (float)(1 << 12)) * (float)adcval_bal;
     /* float shunt_volt = amp_out_volt * phase_current_rev_gain_;
     float current = shunt_volt * shunt_conductance; */

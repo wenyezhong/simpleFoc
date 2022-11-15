@@ -120,10 +120,11 @@ void DRV8301_setup() {
 
 BLDCMotor motor = BLDCMotor(7);
 BLDCDriver3PWM driver = BLDCDriver3PWM(5, 10, 6, 8);
-Encoder encoder = Encoder(1,2,4096);
+Encoder encoder = Encoder(1,2,4096,3);
 // channel A and B callbacks
 void doA(){encoder.handleA();}
 void doB(){encoder.handleB();}
+void doIndex(){encoder.handleIndex();}
 InlineCurrentSense current_sense = InlineCurrentSense(SHUNT_RESISTANCE, 1.0f/phase_current_rev_gain_,NOT_SET,0,0);
 
 
@@ -136,11 +137,10 @@ void doMotion(char* cmd){ command.motion(&motor, cmd); }
 int simpleFOCDrive_main(void)
 {
     
-    DRV8301_setup();      
-
+    DRV8301_setup();
     // initialize encoder sensor hardware
     encoder.init();
-    encoder.enableInterrupts(doA, doB);
+    encoder.enableInterrupts(doA, doB,doIndex);
     // link the motor to the sensor
     motor.linkSensor(&encoder);
 

@@ -120,101 +120,98 @@ void DRV8301_setup() {
 
 BLDCMotor motor = BLDCMotor(7);
 BLDCDriver3PWM driver = BLDCDriver3PWM(5, 10, 6, 8);
-Encoder encoder = Encoder(1,2,4096);
+Encoder encoder = Encoder(1,2,4096,3);
 // channel A and B callbacks
 void doA(){encoder.handleA();}
 void doB(){encoder.handleB();}
-InlineCurrentSense current_sense = InlineCurrentSense(SHUNT_RESISTANCE, 1.0f/phase_current_rev_gain_,NOT_SET,0,0);
+void doIndex(){encoder.handleIndex();}
+// InlineCurrentSense current_sense = InlineCurrentSense(SHUNT_RESISTANCE, 1.0f/phase_current_rev_gain_,NOT_SET, 0, 0);
 
 
-//target variable
-// float target_velocity = 0;
+// velocity set point variable
+float target_velocity = 0;
 // instantiate the commander
 Commander command = Commander(Serial);
-void doMotion(char* cmd){ command.motion(&motor, cmd); }
+void doTarget(char* cmd) { command.scalar(&target_velocity, cmd); }
 
 int simpleFOCDrive_main(void)
 {
     
     DRV8301_setup();      
 
-    // initialize encoder sensor hardware
-    encoder.init();
-    encoder.enableInterrupts(doA, doB);
-    // link the motor to the sensor
-    motor.linkSensor(&encoder);
+      // initialize encoder sensor hardware
+  encoder.init();
+  encoder.enableInterrupts(doA,doB,doIndex);
+  // software interrupts
+//   PciManager.registerListener(&listenerIndex);
+  // link the motor to the sensor
+  motor.linkSensor(&encoder);
 
-    // driver config
-    // power supply voltage [V]
-    driver.voltage_power_supply = 24;
-    driver.init();
-    // link driver
-    motor.linkDriver(&driver);
-    // link current sense and the driver
-    current_sense.linkDriver(&driver);
+  // driver config
+  // power supply voltage [V]
+  driver.voltage_power_supply = 24;
+  driver.init();
+  // link the motor and the driver
+  motor.linkDriver(&driver);
 
-    // set control loop type to be used
-    motor.controller = MotionControlType::torque;
+  // aligning voltage [V]
+  motor.voltage_sensor_align = 3;
+  // index search velocity [rad/s]
+  motor.velocity_index_search = 3;
 
-    // contoller configuration based on the controll type
-    motor.PID_velocity.P = 0.05f;
-    motor.PID_velocity.I = 1;
-    motor.PID_velocity.D = 0;
-    // default voltage_power_supply
-    motor.voltage_limit = 12;
+  // set motion control loop to be used
+  motor.controller = MotionControlType::velocity;
 
-    // velocity low pass filtering time constant
-    motor.LPF_velocity.Tf = 0.01f;
+  // contoller configuration
+  // default parameters in defaults.h
 
-    // angle loop controller
-    motor.P_angle.P = 20;
-    // angle loop velocity limit
-    motor.velocity_limit = 20;
+  // velocity PI controller parameters
+  motor.PID_velocity.P = 0.2f;
+  motor.PID_velocity.I = 0.5f;
+  motor.PID_velocity.D = 0;
+  // default voltage_power_supply
+  motor.voltage_limit = 12;
+  motor.velocity_limit = 20;
+  // jerk control using voltage voltage ramp
+  // default value is 300 volts per sec  ~ 0.3V per millisecond
+  motor.PID_velocity.output_ramp = 1000;
 
-    // use monitoring with serial for motor init
-    // monitoring port
-    // comment out if not needed
-    motor.useMonitoring(Serial);
-    motor.monitor_downsample = 0; // disable intially
-    motor.monitor_variables = _MON_TARGET | _MON_VEL | _MON_ANGLE; // monitor target velocity and angle
+  // velocity low pass filtering time constant
+  motor.LPF_velocity.Tf = 0.01f;
 
-    // current sense init and linking
-    current_sense.init();
-    motor.linkCurrentSense(&current_sense);
+ // comment out if not needed
+  motor.useMonitoring(Serial);
 
-    // initialise motor
-    motor.init();
-    // align encoder and start FOC
-    motor.initFOC();
+  // initialize motor
+  motor.init();
+  // align sensor and start FOC
+  motor.initFOC();
 
-    // set the inital target value
-    motor.target = 2;
+  // add target command T
+  command.add('T', doTarget, "target velocity");
 
-    // subscribe motor to the commander
-    command.add('T', doMotion, "motion control");
-    // command.add('M', doMotor, "motor");
-
-    // Run user commands to configure and the motor (find the full command list in docs.simplefoc.com)
-    Serial.println("Motor ready.");
-
-    _delay(1000);
-
+  Serial.println(F("Motor ready."));
+  Serial.println(F("Set the target velocity using serial terminal:"));
+  _delay(1000);
     return 0;
 }
 
 void  motorTask()
 {
-    // iterative setting FOC phase voltage
     motor.loopFOC();
 
-    // iterative function setting the outter loop target
-    motor.move();
+  // Motion control function
+  // velocity, position or voltage (defined in motor.controller)
+  // this function can be run at much lower frequency than loopFOC() function
+  // You can also use motor.move() and set the motor.target in the code
+  motor.move(target_velocity);
 
-    // motor monitoring
-    motor.monitor();
+  // function intended to be used with serial plotter to monitor motor variables
+  // significantly slowing the execution down!!!!
+  // motor.monitor();
 
-    // user communication
-    command.run();
+  // user communication
+  command.run();
 }
 
 }

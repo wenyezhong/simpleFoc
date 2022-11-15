@@ -7,7 +7,7 @@
 
 
 
-uint32_t phB_ADCValue,phC_ADCValue;
+float phB_ADCValue,phC_ADCValue;
 
 uint16_t adc_measurements_[ADC_CHANNEL_COUNT] = { 0 };
 constexpr float adc_full_scale = static_cast<float>(1UL << 12UL);
@@ -51,19 +51,20 @@ void pwm_trig_adc_cb(ADC_HandleTypeDef* hadc, bool injected) {
     }
     // float current = axis.motor_.phase_current_from_adcval(ADCValue);
     // printf("ADCValue=%.4x\r\n",ADCValue);
-    /* int adcval_bal = (int)ADCValue - (1 << 11);
+    // int adcval_bal = (int)ADCValue - (1 << 11);
+    int adcval_bal = (int)ADCValue;
     float amp_out_volt = (3.3f / (float)(1 << 12)) * (float)adcval_bal;
-    float shunt_volt = amp_out_volt * phase_current_rev_gain_;
+    /* float shunt_volt = amp_out_volt * phase_current_rev_gain_;
     float current = shunt_volt * shunt_conductance; */
     // printf("current=%f\r\n",current);
     //return current;
     if(hadc == &hadc2)
     {
-      phB_ADCValue= ADCValue;
+      phB_ADCValue= amp_out_volt;
     } 
     else
     {
-      phC_ADCValue= ADCValue;
+      phC_ADCValue= amp_out_volt;
     }
 }
 }

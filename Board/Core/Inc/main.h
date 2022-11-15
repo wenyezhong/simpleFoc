@@ -85,6 +85,9 @@ void Error_Handler(void);
 #define M0_TEMP_GPIO_Port GPIOC
 #define EN_GATE_Pin GPIO_PIN_12
 #define EN_GATE_GPIO_Port GPIOB
+#define M0_ENC_Z_Pin GPIO_PIN_9
+#define M0_ENC_Z_GPIO_Port GPIOC
+#define M0_ENC_Z_EXTI_IRQn EXTI9_5_IRQn
 #define M0_AH_Pin GPIO_PIN_8
 #define M0_AH_GPIO_Port GPIOA
 #define M0_BH_Pin GPIO_PIN_9
@@ -97,6 +100,12 @@ void Error_Handler(void);
 #define nFAULT_GPIO_Port GPIOD
 #define GPIO8_Pin GPIO_PIN_3
 #define GPIO8_GPIO_Port GPIOB
+#define M0_ENC_A_Pin GPIO_PIN_4
+#define M0_ENC_A_GPIO_Port GPIOB
+#define M0_ENC_A_EXTI_IRQn EXTI4_IRQn
+#define M0_ENC_B_Pin GPIO_PIN_5
+#define M0_ENC_B_GPIO_Port GPIOB
+#define M0_ENC_B_EXTI_IRQn EXTI9_5_IRQn
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

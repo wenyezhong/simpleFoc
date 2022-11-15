@@ -32,8 +32,8 @@ void MX_TIM1_Init(void)
 {
 
   /* USER CODE BEGIN TIM1_Init 0 */
-  /*定时�?1 更新频率�?48KHz,即为0到htim1.Init.Period，中心对齐方式，即下坡再下坡的频率就�?24KHz
-  htim1.Init.RepetitionCounter =1  即两个update事件为一个周期，即为24KHz 那么ADC中断 TRGO频率�?24KHz*/
+  /*定时�?1 更新频率�?48KHz,即为0到htim1.Init.Period，中心对齐方式，即下坡再下坡的频率就�?24KHz
+  htim1.Init.RepetitionCounter =1  即两个update事件为一个周期，即为24KHz 那么ADC中断 TRGO频率�?24KHz*/
 
   /* USER CODE END TIM1_Init 0 */
 

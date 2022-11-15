@@ -124,7 +124,7 @@ Encoder encoder = Encoder(1,2,4096);
 // channel A and B callbacks
 void doA(){encoder.handleA();}
 void doB(){encoder.handleB();}
-InlineCurrentSense current_sense = InlineCurrentSense(SHUNT_RESISTANCE, 1.0f/phase_current_rev_gain_,NOT_SET,0,0);
+InlineCurrentSense current_sense = InlineCurrentSense(SHUNT_RESISTANCE, 1.0f/phase_current_rev_gain_,NOT_SET, 0, 0);
 
 
 //target variable
@@ -161,7 +161,7 @@ int simpleFOCDrive_main(void)
     motor.PID_velocity.I = 1;
     motor.PID_velocity.D = 0;
     // default voltage_power_supply
-    motor.voltage_limit = 12;
+    motor.voltage_limit = 24;
 
     // velocity low pass filtering time constant
     motor.LPF_velocity.Tf = 0.01f;

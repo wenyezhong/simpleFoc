@@ -1,20 +1,52 @@
 #include "Encoder.h"
-
+#include "gpio.h"
 
 /* #define INPUT  0
 #define INPUT_PULLUP 1 */
 // #define pinMode((A), (INPUT_PULLUP))  (A)
+typedef void (*pf_callbakck)(void);
 
+pf_callbakck functionA=nullptr;
+pf_callbakck functionB=nullptr;
+pf_callbakck functionZ=nullptr;
+
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  switch(GPIO_Pin)
+  {
+    case M0_ENC_A_Pin:{
+      functionA();
+    }break;
+    case M0_ENC_B_Pin:{
+      functionB();
+    }break;
+    case M0_ENC_Z_Pin:{
+      functionZ();
+    }break;
+    default:break;
+  }
+  
+}
+int digitalRead(int pin)
+{
+  bool tmp;
+  switch(pin)
+  {
+    case 1:tmp=HAL_GPIO_ReadPin(M0_ENC_A_GPIO_Port, M0_ENC_A_Pin);break;
+    case 2:tmp=HAL_GPIO_ReadPin(M0_ENC_B_GPIO_Port, M0_ENC_B_Pin);break;
+    case 3:tmp=HAL_GPIO_ReadPin(M0_ENC_Z_GPIO_Port, M0_ENC_Z_Pin);break;
+    default:break;
+  }  
+  return tmp;
+}
 /*
   Encoder(int encA, int encB , int cpr, int index)
   - encA, encB    - encoder A and B pins
   - cpr           - counts per rotation number (cpm=ppm*4)
   - index pin     - (optional input)
 */
-int digitalRead(int)
-{
-  return 0;
-}
+
 Encoder::Encoder(int _encA, int _encB , float _ppr, int _index){
 
   // Encoder measurement structure init
@@ -217,21 +249,37 @@ void Encoder::init(){
 
 // function enabling hardware interrupts of the for the callback provided
 // if callback is not provided then the interrupt is not enabled
-void Encoder::enableInterrupts(void (*doA)(), void(*doB)(), void(*doIndex)()){
-  // attach interrupt if functions provided
-  /* switch(quadrature){
-    case Quadrature::ON:
-      // A callback and B callback
-      if(doA != nullptr) attachInterrupt(digitalPinToInterrupt(pinA), doA, CHANGE);
-      if(doB != nullptr) attachInterrupt(digitalPinToInterrupt(pinB), doB, CHANGE);
+void Encoder::enableInterrupts(void (*doA)(), void(*doB)(), void(*doIndex)())
+{
+
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  if(doA != nullptr) functionA=doA;
+  if(doB != nullptr) functionB=doB;
+
+  GPIO_InitStruct.Pin = M0_ENC_A_Pin|M0_ENC_B_Pin;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  switch(quadrature){
+    case Quadrature::ON:      
+      /*Configure GPIO pins : PBPin PBPin */
+      
+      GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
+      
       break;
     case Quadrature::OFF:
       // A callback and B callback
-      if(doA != nullptr) attachInterrupt(digitalPinToInterrupt(pinA), doA, RISING);
-      if(doB != nullptr) attachInterrupt(digitalPinToInterrupt(pinB), doB, RISING);
+
+      GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+
       break;
   }
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  GPIO_InitStruct.Pin = M0_ENC_Z_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(M0_ENC_Z_GPIO_Port, &GPIO_InitStruct);
 
   // if index used initialize the index interrupt
-  if(hasIndex() && doIndex != nullptr) attachInterrupt(digitalPinToInterrupt(index_pin), doIndex, CHANGE); */
+  if(hasIndex() && doIndex != nullptr) 
+    functionZ=doIndex;
 }

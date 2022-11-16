@@ -115,7 +115,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   // test();
   // testSimpleFOCDebug();
-  
+  DRV8301_setup();
   setup();
   while (1)
   {

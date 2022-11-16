@@ -123,10 +123,8 @@ BLDCDriver3PWM driver = BLDCDriver3PWM(9, 5, 6, 8);
 Commander command = Commander(Serial);
 void doTarget(char* cmd) { command.scalar(&motor.target, cmd); }
 float target_velocity = 2;
-void setup() {
 
-
-    DRV8301_setup();
+void setup() {   
 
   // 配置驱动器
   // 电源电压 [V]

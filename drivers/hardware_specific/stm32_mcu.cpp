@@ -3,114 +3,18 @@
 #include "stm32_mcu.h"
 #include "tim.h"
 #include "adc.h"
+#include "stm32f4xx_ll_tim.h"
 // #include <stdbool.h>
 
 
 
-volatile float phB_ADCValue,phC_ADCValue;
 
-uint16_t adc_measurements_[ADC_CHANNEL_COUNT] = { 0 };
-constexpr float adc_full_scale = static_cast<float>(1UL << 12UL);
-constexpr float adc_ref_voltage = 3.3f;
-float vbus_voltage = 12.0f;
 
 
 extern float phase_current_rev_gain_;
 extern float shunt_conductance;
 
 
-extern "C" {
-
-void vbus_sense_adc_cb(ADC_HandleTypeDef* hadc, bool injected) {
-    constexpr float voltage_scale = adc_ref_voltage * VBUS_S_DIVIDER_RATIO / adc_full_scale;
-    // Only one conversion in sequence, so only rank1
-    uint32_t ADCValue = HAL_ADCEx_InjectedGetValue(hadc, ADC_INJECTED_RANK_1);
-    vbus_voltage = ADCValue * voltage_scale;
-    // printf("vbus_voltage=%f\r\n",vbus_voltage);
-}
-// This is the callback from the ADC that we expect after the PWM has triggered an ADC conversion.
-// Timing diagram: Firmware/timing_diagram_v3.png
-void pwm_trig_adc_cb(ADC_HandleTypeDef* hadc, bool injected) {
-#define calib_tau 0.2f  //@TOTO make more easily configurable
-    constexpr float calib_filter_k = CURRENT_MEAS_PERIOD / calib_tau;
-
-    // Ensure ADCs are expected ones to simplify the logic below
-    if (!(hadc == &hadc2 || hadc == &hadc3)) {
-        // low_level_fault(Motor::ERROR_ADC_FAILED);
-        return;
-    };    
-
-
-    uint32_t ADCValue;
-    if (injected) {
-        ADCValue = HAL_ADCEx_InjectedGetValue(hadc, ADC_INJECTED_RANK_1);
-    } 
-    else
-    {
-        ADCValue = HAL_ADC_GetValue(hadc);
-    }
-    // float current = axis.motor_.phase_current_from_adcval(ADCValue);
-    // printf("ADCValue=%.4x\r\n",ADCValue);
-    // int adcval_bal = (int)ADCValue - (1 << 11);
-    int adcval_bal = ADCValue;
-    float amp_out_volt = (3.3f / (float)(1 << 12)) * (float)adcval_bal;
-    /* float shunt_volt = amp_out_volt * phase_current_rev_gain_;
-    float current = shunt_volt * shunt_conductance; */
-    // printf("current=%f\r\n",current);
-    //return current;
-    if(hadc == &hadc2)
-    {
-      phB_ADCValue = amp_out_volt;
-    } 
-    else
-    {
-      phC_ADCValue = amp_out_volt;
-    }
-}
-}
-
-// @brief Given an adc channel return the measured voltage.
-// returns NaN if the channel is not valid.
-float get_adc_voltage_channel(uint16_t channel)
-{
-    if (channel < ADC_CHANNEL_COUNT)
-        return ((float)adc_measurements_[channel]) * (adc_ref_voltage / adc_full_scale);
-    else
-        return 0.0f / 0.0f; // NaN
-}
-
-void start_general_purpose_adc() {
-    ADC_ChannelConfTypeDef sConfig;
-
-    // Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
-    hadc1.Instance = ADC1;
-    hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
-    hadc1.Init.Resolution = ADC_RESOLUTION_12B;
-    hadc1.Init.ScanConvMode = ENABLE;
-    hadc1.Init.ContinuousConvMode = ENABLE;
-    hadc1.Init.DiscontinuousConvMode = DISABLE;
-    hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
-    hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
-    hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-    hadc1.Init.NbrOfConversion = ADC_CHANNEL_COUNT;
-    hadc1.Init.DMAContinuousRequests = ENABLE;
-    hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
-    if (HAL_ADC_Init(&hadc1) != HAL_OK)
-    {
-        Error_Handler();
-    }
-
-    // Set up sampling sequence (channel 0 ... channel 15)
-    sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;
-    for (uint32_t channel = 0; channel < ADC_CHANNEL_COUNT; ++channel) {
-        sConfig.Channel = channel << ADC_CR1_AWDCH_Pos;
-        sConfig.Rank = channel + 1; // rank numbering starts at 1
-        if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
-            Error_Handler();
-    }
-
-    HAL_ADC_Start_DMA(&hadc1, reinterpret_cast<uint32_t*>(adc_measurements_), ADC_CHANNEL_COUNT);
-}
 
 /* Function implementations --------------------------------------------------*/
 void start_pwm(TIM_HandleTypeDef* htim)
@@ -128,7 +32,6 @@ void start_pwm(TIM_HandleTypeDef* htim)
   // HAL_TIMEx_PWMN_Start(htim, TIM_CHANNEL_2);
   HAL_TIM_PWM_Start(htim, TIM_CHANNEL_3);
     // HAL_TIMEx_PWMN_Start(htim, TIM_CHANNEL_3);
-
     // htim->Instance->CCR4 = 1;
     // HAL_TIM_PWM_Start_IT(htim, TIM_CHANNEL_4);
 }
@@ -191,6 +94,62 @@ void _writeDutyCycle3PWM(float dc_a,  float dc_b, float dc_c, void* params){
   // _setPwm(((STM32DriverParams*)params)->timers[0], ((STM32DriverParams*)params)->channels[0], _PWM_RANGE*dc_a, _PWM_RESOLUTION);
   // _setPwm(((STM32DriverParams*)params)->timers[1], ((STM32DriverParams*)params)->channels[1], _PWM_RANGE*dc_b, _PWM_RESOLUTION);
   // _setPwm(((STM32DriverParams*)params)->timers[2], ((STM32DriverParams*)params)->channels[2], _PWM_RANGE*dc_c, _PWM_RESOLUTION);
+}
+
+void timer_pause(TIM_HandleTypeDef* tim_motorHandle)
+{
+
+  // Disable all IT
+  __HAL_TIM_DISABLE_IT(tim_motorHandle, TIM_IT_UPDATE);
+  __HAL_TIM_DISABLE_IT(tim_motorHandle, TIM_IT_CC1);
+  __HAL_TIM_DISABLE_IT(tim_motorHandle, TIM_IT_CC2);
+  __HAL_TIM_DISABLE_IT(tim_motorHandle, TIM_IT_CC3);
+  __HAL_TIM_DISABLE_IT(tim_motorHandle, TIM_IT_CC4);
+
+  // Stop timer. Required to restore HAL State: HAL_TIM_STATE_READY
+  HAL_TIM_Base_Stop(tim_motorHandle);
+
+  /* Disable timer unconditionally. Required to guarantee timer is stopped,
+   * even if some channels are still running */
+  LL_TIM_DisableCounter(tim_motorHandle->Instance);
+
+#if defined(TIM_CHANNEL_STATE_SET_ALL)
+  /* Starting from G4, new Channel state implementation prevents to restart a channel,
+     if the channel has not been explicitly be stopped with HAL interface */
+  TIM_CHANNEL_STATE_SET_ALL(tim_motorHandle, HAL_TIM_CHANNEL_STATE_READY);
+#endif
+#if defined(TIM_CHANNEL_N_STATE_SET_ALL)
+  TIM_CHANNEL_N_STATE_SET_ALL(tim_motorHandle, HAL_TIM_CHANNEL_STATE_READY);
+#endif
+
+}
+void timer_resume(TIM_HandleTypeDef* tim_motorHandle)
+{
+  // Clear flag and enable IT
+
+  __HAL_TIM_CLEAR_FLAG(tim_motorHandle, TIM_FLAG_UPDATE);
+  __HAL_TIM_ENABLE_IT(tim_motorHandle, TIM_IT_UPDATE);
+
+  // Start timer in Time base mode. Required when there is no channel used but only update interrupt.
+  HAL_TIM_Base_Start(tim_motorHandle);
+
+}
+
+// align the timers to end the init
+void _stopTimers(TIM_HandleTypeDef* tim_motorHandle)
+{
+  // TODO - stop each timer only once
+  // stop timers
+  timer_pause(tim_motorHandle);
+  // timers_to_stop[i]->refresh();  
+}
+
+// align the timers to end the init
+void _startTimers(TIM_HandleTypeDef* tim_motorHandle)
+{
+  // TODO - sart each timer only once
+  // sart timers
+  timer_resume(tim_motorHandle);
 }
 
 
@@ -340,34 +299,6 @@ void _alignPWMTimers(HardwareTimer *HT1, HardwareTimer *HT2, HardwareTimer *HT3,
 }
 
 
-// align the timers to end the init
-void _stopTimers(HardwareTimer **timers_to_stop, int timer_num)
-{
-  // TODO - stop each timer only once
-  // stop timers
-  for (int i=0; i < timer_num; i++) {
-    if(timers_to_stop[i] == NP) return;
-    timers_to_stop[i]->pause();
-    timers_to_stop[i]->refresh();
-    #ifdef SIMPLEFOC_STM32_DEBUG
-      SIMPLEFOC_DEBUG("STM32-DRV: Stopping timer ", getTimerNumber(get_timer_index(timers_to_stop[i]->getHandle()->Instance)));
-    #endif
-  }
-}
-
-// align the timers to end the init
-void _startTimers(HardwareTimer **timers_to_start, int timer_num)
-{
-  // TODO - sart each timer only once
-  // sart timers
-  for (int i=0; i < timer_num; i++) {
-    if(timers_to_start[i] == NP) return;
-    timers_to_start[i]->resume();
-    #ifdef SIMPLEFOC_STM32_DEBUG
-      SIMPLEFOC_DEBUG("STM32-DRV: Starting timer ", getTimerNumber(get_timer_index(timers_to_start[i]->getHandle()->Instance)));
-    #endif
-  }
-}
 
 void _alignTimersNew() {
   int numTimers = 0;

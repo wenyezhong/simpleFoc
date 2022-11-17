@@ -139,7 +139,8 @@ simpleFoc_firmware_pkg = {
         'MotorControl/main.cpp',
         'MotorControl/BLDCMotor.cpp',
         'drivers/BLDCDriver3PWM.cpp',
-        'current_sense/InlineCurrentSense.cpp',
+        'current_sense/LowsideCurrentSense.cpp',
+        'current_sense/stm32f4_mcu.cpp',
     },
     cflags = {'-D_STM32_DEF_'},  
 }

@@ -1,13 +1,12 @@
-#include "InlineCurrentSense.h"
-#include <arm_math.h>
-#include <stdio.h>
-// InlineCurrentSensor constructor
+#include "LowsideCurrentSense.h"
+#include "tim.h"
+// LowsideCurrentSensor constructor
 //  - shunt_resistor  - shunt resistor value
 //  - gain  - current-sense op-amp gain
 //  - phA   - A phase adc pin
 //  - phB   - B phase adc pin
 //  - phC   - C phase adc pin (optional)
-InlineCurrentSense::InlineCurrentSense(float _shunt_resistor, float _gain, int _pinA, int _pinB, int _pinC){
+LowsideCurrentSense::LowsideCurrentSense(float _shunt_resistor, float _gain, int _pinA, int _pinB, int _pinC){
     pinA = _pinA;
     pinB = _pinB;
     pinC = _pinC;
@@ -18,53 +17,53 @@ InlineCurrentSense::InlineCurrentSense(float _shunt_resistor, float _gain, int _
     // gains for each phase
     gain_a = volts_to_amps_ratio;
     gain_b = volts_to_amps_ratio;
-    gain_c = volts_to_amps_ratio;    
+    gain_c = volts_to_amps_ratio;
 }
 
-// Inline sensor init function
-int InlineCurrentSense::init(){
-    // if no linked driver its fine in this case 
-    // at least for init()
-    void* drv_params = driver ? driver->params : nullptr;
+// Lowside sensor init function
+int LowsideCurrentSense::init(){
     // configure ADC variables
-    //params = _configureADCInline(drv_params,pinA,pinB,pinC);
+    params = _configureADCLowSide(driver->params,pinA,pinB,pinC);
     // if init failed return fail
-    
+    if (params == SIMPLEFOC_CURRENT_SENSE_INIT_FAILED) return 0; 
+    // sync the driver
+    _driverSyncLowSide(&htim1);
     // calibrate zero offsets
     calibrateOffsets();
     // set the initialized flag
-    initialized = 1;
+    initialized = (params!=SIMPLEFOC_CURRENT_SENSE_INIT_FAILED);
     // return success
     return 1;
 }
 // Function finding zero offsets of the ADC
-void InlineCurrentSense::calibrateOffsets(){
+void LowsideCurrentSense::calibrateOffsets(){    
     const int calibration_rounds = 1000;
-    
+
     // find adc offset = zero current voltage
     offset_ia = 0;
     offset_ib = 0;
     offset_ic = 0;
     // read the adc voltage 1000 times ( arbitrary number )
     for (int i = 0; i < calibration_rounds; i++) {
-        offset_ia += 0;
-        offset_ib += phB_ADCValue;
-        offset_ic += phC_ADCValue;        
+        // _startADC3PinConversionLowSide();
+        if(_isset(pinA)) offset_ia += (_readADCVoltageLowSide(1));
+        if(_isset(pinB)) offset_ib += (_readADCVoltageLowSide(2));
+        if(_isset(pinC)) offset_ic += (_readADCVoltageLowSide(3));
         _delay(1);
     }
     // calculate the mean offsets
-    offset_ia = offset_ia / calibration_rounds;
-    offset_ib = offset_ib / calibration_rounds;
-    offset_ic = offset_ic / calibration_rounds;
+    if(_isset(pinA)) offset_ia = offset_ia / calibration_rounds;
+    if(_isset(pinB)) offset_ib = offset_ib / calibration_rounds;
+    if(_isset(pinC)) offset_ic = offset_ic / calibration_rounds;
 }
 
 // read all three phase currents (if possible 2 or 3)
-PhaseCurrent_s InlineCurrentSense::getPhaseCurrents(){
+PhaseCurrent_s LowsideCurrentSense::getPhaseCurrents(){
     PhaseCurrent_s current;
-    current.a = 0;
-    // current.a = (!_isset(pinA)) ? 0 : (phB_ADCValue - offset_ia)*gain_a;// amps
-    current.b = (!_isset(pinB)) ? 0 : (phB_ADCValue - offset_ib)*gain_b;// amps
-    current.c = (!_isset(pinC)) ? 0 : (phC_ADCValue - offset_ic)*gain_c; // amps
+    // _startADC3PinConversionLowSide();
+    current.a = (!_isset(pinA)) ? 0 : (_readADCVoltageLowSide(1) - offset_ia)*gain_a;// amps
+    current.b = (!_isset(pinB)) ? 0 : (_readADCVoltageLowSide(2) - offset_ib)*gain_b;// amps
+    current.c = (!_isset(pinC)) ? 0 : (_readADCVoltageLowSide(3) - offset_ic)*gain_c; // amps
     return current;
 }
 
@@ -76,7 +75,7 @@ PhaseCurrent_s InlineCurrentSense::getPhaseCurrents(){
 // 2 - success but pins reconfigured
 // 3 - success but gains inverted
 // 4 - success but pins reconfigured and gains inverted
-int InlineCurrentSense::driverAlign(float voltage){
+int LowsideCurrentSense::driverAlign(float voltage){
     
     int exit_flag = 1;
     if(skip_align) return exit_flag;

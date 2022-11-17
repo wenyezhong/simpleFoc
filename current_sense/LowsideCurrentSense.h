@@ -1,28 +1,29 @@
-#ifndef INLINE_CS_LIB_H
-#define INLINE_CS_LIB_H
+#ifndef LOWSIDE_CS_LIB_H
+#define LOWSIDE_CS_LIB_H
 
+// #include "Arduino.h"
 #include "../common/foc_utils.h"
 #include "../common/time_utils.h"
 #include "../common/defaults.h"
 #include "../common/base_classes/CurrentSense.h"
+#include "../common/base_classes/FOCMotor.h"
 #include "../common/lowpass_filter.h"
 #include "hardware_api.h"
 
-extern uint32_t phB_ADCValue,phC_ADCValue;
 
-class InlineCurrentSense: public CurrentSense{
+class LowsideCurrentSense: public CurrentSense{
   public:
     /**
-      InlineCurrentSense class constructor
+      LowsideCurrentSense class constructor
       @param shunt_resistor shunt resistor value
       @param gain current-sense op-amp gain
       @param phA A phase adc pin
       @param phB B phase adc pin
       @param phC C phase adc pin (optional)
     */
-    InlineCurrentSense(float shunt_resistor, float gain, int pinA, int pinB, int pinC = NOT_SET);
+    LowsideCurrentSense(float shunt_resistor, float gain, int pinA, int pinB, int pinC = _NC);
 
-    // CurrentSense interface implementing functions 
+    // CurrentSense interface implementing functions
     int init() override;
     PhaseCurrent_s getPhaseCurrents() override;
     int driverAlign(float align_voltage) override;
@@ -39,8 +40,11 @@ class InlineCurrentSense: public CurrentSense{
     // LowPassFilter lpf_b{DEF_LPF_PER_PHASE_CURRENT_SENSE_Tf}; //!<  current B low pass filter
     // LowPassFilter lpf_c{DEF_LPF_PER_PHASE_CURRENT_SENSE_Tf}; //!<  current C low pass filter
 
+    float offset_ia; //!< zero current A voltage value (center of the adc reading)
+    float offset_ib; //!< zero current B voltage value (center of the adc reading)
+    float offset_ic; //!< zero current C voltage value (center of the adc reading)
   private:
-  
+
     // hardware variables
   	int pinA; //!< pin A analog pin for current measurement
   	int pinB; //!< pin B analog pin for current measurement
@@ -50,14 +54,11 @@ class InlineCurrentSense: public CurrentSense{
     float shunt_resistor; //!< Shunt resistor value
     float amp_gain; //!< amp gain value
     float volts_to_amps_ratio; //!< Volts to amps ratio
-    
+
     /**
      *  Function finding zero offsets of the ADC
      */
     void calibrateOffsets();
-    float offset_ia; //!< zero current A voltage value (center of the adc reading)
-    float offset_ib; //!< zero current B voltage value (center of the adc reading)
-    float offset_ic; //!< zero current C voltage value (center of the adc reading)
 
 };
 

@@ -246,10 +246,13 @@ void EXTI4_IRQHandler(void)
 void ADC_IRQHandler(void)
 {
   /* USER CODE BEGIN ADC_IRQn 0 */
-  HAL_GPIO_TogglePin(GPIO7_GPIO_Port, GPIO7_Pin);
+  // HAL_GPIO_TogglePin(GPIO7_GPIO_Port, GPIO7_Pin);
+  HAL_GPIO_WritePin(GPIO7_GPIO_Port, GPIO7_Pin,GPIO_PIN_SET);
   ADC_IRQ_Dispatch(&hadc1, &vbus_sense_adc_cb);
   ADC_IRQ_Dispatch(&hadc2, &pwm_trig_adc_cb);
   ADC_IRQ_Dispatch(&hadc3, &pwm_trig_adc_cb);
+  // delayMicroseconds(2);
+  HAL_GPIO_WritePin(GPIO7_GPIO_Port, GPIO7_Pin,GPIO_PIN_RESET);
   // Bypass HAL
   //  return;
 
@@ -283,11 +286,13 @@ void EXTI9_5_IRQHandler(void)
 void TIM1_UP_TIM10_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_UP_TIM10_IRQn 0 */
-  HAL_GPIO_TogglePin(GPIO8_GPIO_Port, GPIO8_Pin);
+  HAL_GPIO_WritePin(GPIO8_GPIO_Port, GPIO8_Pin,GPIO_PIN_SET);
+  // HAL_GPIO_TogglePin(GPIO8_GPIO_Port, GPIO8_Pin);
   /* USER CODE END TIM1_UP_TIM10_IRQn 0 */
   HAL_TIM_IRQHandler(&htim1);
+  // delayMicroseconds(2);
   /* USER CODE BEGIN TIM1_UP_TIM10_IRQn 1 */
-
+  HAL_GPIO_WritePin(GPIO8_GPIO_Port, GPIO8_Pin,GPIO_PIN_RESET);
   /* USER CODE END TIM1_UP_TIM10_IRQn 1 */
 }
 

@@ -53,13 +53,13 @@ void _startADC3PinConversionLowSide();
  * @param pinA - the arduino pin to be read (it has to be ADC pin)
  * @param cs_params -current sense parameter structure - hardware specific
  */
-float _readADCVoltageLowSide(const int pinA, const void* cs_params);
+float _readADCVoltageLowSide(int index);
 
 /**
  *  function syncing the Driver with the ADC  for the LowSide Sensing
  * @param driver_params - driver parameter structure - hardware specific
  * @param cs_params - current sense parameter structure - hardware specific
  */
-void _driverSyncLowSide(void* driver_params, void* cs_params);
+void _driverSyncLowSide(TIM_HandleTypeDef* tim_motorHandle);
 
 #endif

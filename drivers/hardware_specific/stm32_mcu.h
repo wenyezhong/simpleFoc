@@ -39,6 +39,9 @@ typedef struct STM32DriverParams {
   uint8_t interface_type;
 } STM32DriverParams;
 
+
+void _stopTimers(TIM_HandleTypeDef* tim_motorHandle);
+void _startTimers(TIM_HandleTypeDef* tim_motorHandle);
 // timer synchornisation functions
 /* void _stopTimers(HardwareTimer **timers_to_stop, int timer_num=6);
 void _startTimers(HardwareTimer **timers_to_start, int timer_num=6); */

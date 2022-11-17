@@ -123,7 +123,7 @@ BLDCDriver3PWM driver = BLDCDriver3PWM(9, 5, 6, 8);
 Commander command = Commander(Serial);
 void doTarget(char* cmd) { command.scalar(&motor.target, cmd); }
 float target_velocity = 2;
-
+LowsideCurrentSense current_sense = LowsideCurrentSense(SHUNT_RESISTANCE, 1.0f/phase_current_rev_gain_,NOT_SET, 0, 0);
 void setup() {   
 
   // 配置驱动器
@@ -156,9 +156,9 @@ void loop() {
 
   // 开环速度运动
   // 使用电机电压限制和电机速度限制
-  motor.move(target_velocity);
+ /*  motor.move(target_velocity);
   // 用户通信
-  command.run();
+  command.run(); */
 }
 
 }

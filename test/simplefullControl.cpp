@@ -116,15 +116,14 @@ void DRV8301_setup() {
 
 
 
-
-
 BLDCMotor motor = BLDCMotor(7);
 BLDCDriver3PWM driver = BLDCDriver3PWM(5, 10, 6, 8);
-Encoder encoder = Encoder(1,2,4096);
+Encoder encoder = Encoder(1,2,4096,3);
 // channel A and B callbacks
 void doA(){encoder.handleA();}
 void doB(){encoder.handleB();}
-InlineCurrentSense current_sense = InlineCurrentSense(SHUNT_RESISTANCE, 1.0f/phase_current_rev_gain_,NOT_SET, 0, 0);
+void doIndex(){encoder.handleIndex();}
+LowsideCurrentSense current_sense = LowsideCurrentSense(SHUNT_RESISTANCE, 40,NOT_SET, 0, 0);
 
 
 //target variable
@@ -133,14 +132,12 @@ InlineCurrentSense current_sense = InlineCurrentSense(SHUNT_RESISTANCE, 1.0f/pha
 Commander command = Commander(Serial);
 void doMotion(char* cmd){ command.motion(&motor, cmd); }
 
-int simpleFOCDrive_main(void)
+int setup(void)
 {
     
-    DRV8301_setup();      
-
     // initialize encoder sensor hardware
     encoder.init();
-    encoder.enableInterrupts(doA, doB);
+    encoder.enableInterrupts(doA, doB,doIndex);
     // link the motor to the sensor
     motor.linkSensor(&encoder);
 
@@ -161,7 +158,7 @@ int simpleFOCDrive_main(void)
     motor.PID_velocity.I = 1;
     motor.PID_velocity.D = 0;
     // default voltage_power_supply
-    motor.voltage_limit = 24;
+    motor.voltage_limit = 12;
 
     // velocity low pass filtering time constant
     motor.LPF_velocity.Tf = 0.01f;
@@ -202,8 +199,19 @@ int simpleFOCDrive_main(void)
     return 0;
 }
 
-void  motorTask()
+void  loop()
 {
+
+    /* PhaseCurrent_s currents = current_sense.getPhaseCurrents();
+    float current_magnitude = current_sense.getDCCurrent();
+
+    Serial.print(currents.a); // milli Amps
+    Serial.print("\t");
+    Serial.print(currents.b); // milli Amps
+    Serial.print("\t");
+    Serial.print(currents.c); // milli Amps
+    Serial.print("\t");
+    Serial.println(current_magnitude); // milli Amps */
     // iterative setting FOC phase voltage
     motor.loopFOC();
 
@@ -215,7 +223,9 @@ void  motorTask()
 
     // user communication
     command.run();
-}
 
 }
 
+
+
+}

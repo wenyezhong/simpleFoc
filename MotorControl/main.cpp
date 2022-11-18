@@ -114,51 +114,115 @@ void DRV8301_setup() {
 }
 
 
-// 无刷直流电机及驱动器实例
-// BLDCMotor motor = BLDCMotor(pole pair number极对数, phase resistance相电阻（可选的）);
-BLDCMotor motor = BLDCMotor(7);
-// BLDCDriver3PWM driver = BLDCDriver3PWM(pwmA, pwmB, pwmC, 使能引脚（可选的）);
-BLDCDriver3PWM driver = BLDCDriver3PWM(9, 5, 6, 8);
-// commander实例化
-Commander command = Commander(Serial);
-void doTarget(char* cmd) { command.scalar(&motor.target, cmd); }
-float target_velocity = 2;
-LowsideCurrentSense current_sense = LowsideCurrentSense(SHUNT_RESISTANCE, 1.0f/phase_current_rev_gain_,NOT_SET, 0, 0);
-void setup() {   
 
-  // 配置驱动器
-  // 电源电压 [V]
+
+// BLDC motor & driver instance
+BLDCMotor motor = BLDCMotor(7);
+BLDCDriver3PWM driver = BLDCDriver3PWM(9, 5, 6, 8, 4, 7);
+
+// encoder instance
+Encoder encoder = Encoder(1, 2, 4096,3);
+// channel A and B callbacks
+void doA(){encoder.handleA();}
+void doB(){encoder.handleB();}
+void doIndex(){encoder.handleIndex();}
+LowsideCurrentSense current_sense = LowsideCurrentSense(SHUNT_RESISTANCE, 40,NOT_SET, 0, 0);
+
+
+// commander communication instance
+Commander command = Commander(Serial);
+// void doMotor(char* cmd){ command.motor(&motor, cmd); }
+void doTarget(char* cmd){ command.scalar(&motor.target, cmd); }
+
+void setup() {
+
+  // initialize encoder sensor hardware
+  encoder.init();
+  encoder.enableInterrupts(doA, doB,doIndex);
+  // link the motor to the sensor
+  motor.linkSensor(&encoder);
+
+  // driver config
+  // power supply voltage [V]
   driver.voltage_power_supply = 24;
   driver.init();
-  // 连接电机和驱动器
+  // link driver
   motor.linkDriver(&driver);
+  // link current sense and the driver
+  current_sense.linkDriver(&driver);
 
-  // 限制电机运动
-  // motor.phase_resistance = 3.52 // [Ohm]
-  // motor.current_limit = 2;   // [Amps] - 如果相电阻有被定义
-  motor.voltage_limit = 12;   // [V] - 如果相电阻没有定义
-  motor.velocity_limit = 20; // [rad/s] cca 50rpm
- 
-  // 配置开环控制
-  motor.controller = MotionControlType::velocity_openloop;
+  motor.voltage_sensor_align = 0.8f;
+  // set control loop type to be used
+  motor.torque_controller = TorqueControlType::foc_current;
+  motor.controller = MotionControlType::torque;
 
-  // 初始化电机
+  // contoller configuration based on the controll type
+  motor.PID_velocity.P = 0.05f;
+  motor.PID_velocity.I = 1;
+  motor.PID_velocity.D = 0;
+  // default voltage_power_supply
+  motor.voltage_limit = 12;
+  
+  
+  // velocity low pass filtering time constant
+  motor.LPF_velocity.Tf = 0.005f;
+
+  // angle loop controller
+  motor.P_angle.P = 20;
+  // angle loop velocity limit
+  motor.velocity_limit = 50;
+
+
+  motor.foc_modulation = FOCModulationType::SpaceVectorPWM;
+  motor.current_limit = 5;
+  motor.velocity_index_search = 1;
+
+
+  // use monitoring with serial for motor init
+  // monitoring port
+  // Serial.begin(115200);
+  // comment out if not needed
+  motor.useMonitoring(Serial);
+  motor.monitor_downsample = 5000; // disable intially
+  motor.monitor_variables = _MON_TARGET | _MON_VEL | _MON_ANGLE; // monitor target velocity and angle
+
+  // current sense init and linking
+  current_sense.init();
+  motor.linkCurrentSense(&current_sense);
+
+  // initialise motor
   motor.init();
+  // align encoder and start FOC
+  motor.initFOC();
 
-  // 添加目标命令T
-  command.add('T', doTarget, "target velocity");
+  // set the inital target value
+  motor.target = 0;
 
-  Serial.println("Motor ready!");
-  Serial.println("Set target velocity [rad/s]");
+  // subscribe motor to the commander
+  // command.add('M', doMotor, "motor");
+  command.add('T', doTarget, "target");
+
+  // Run user commands to configure and the motor (find the full command list in docs.simplefoc.com)
+  Serial.println("Motor ready.");
+
   _delay(1000);
 }
-void loop() {
 
-  // 开环速度运动
-  // 使用电机电压限制和电机速度限制
- /*  motor.move(target_velocity);
-  // 用户通信
-  command.run(); */
+
+void loop() {
+  // iterative setting FOC phase voltage
+  motor.loopFOC();
+
+  // iterative function setting the outter loop target
+  motor.move();
+
+  // motor monitoring
+  motor.monitor();
+
+  // user communication
+  command.run();
 }
+
+
 
 }
